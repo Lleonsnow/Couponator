@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     take: 200,
     include: {
       user: { select: { email: true } },
-      coupon: { select: { title: true, merchantId: true }, include: { merchant: { select: { name: true } } } },
+      coupon: { select: { title: true, merchant: { select: { name: true } } } },
     },
   });
   return NextResponse.json(list);
