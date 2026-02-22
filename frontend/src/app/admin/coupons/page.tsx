@@ -11,8 +11,13 @@ type Coupon = {
   city: string | null;
   noGeo: boolean;
   imageUrl: string | null;
-  merchant: { name: string };
-  category: { name: string };
+  conditionsHtml?: string;
+  descriptionHtml?: string;
+  addressHtml?: string;
+  merchantId?: string;
+  categoryId?: string;
+  merchant: { id: string; name: string };
+  category: { id: string; name: string };
 };
 
 type Merchant = { id: string; name: string };
@@ -32,6 +37,7 @@ export default function AdminCouponsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [merchantId, setMerchantId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [title, setTitle] = useState("");
@@ -71,6 +77,22 @@ export default function AdminCouponsPage() {
     if (categories.length && !categoryId) setCategoryId(categories[0].id);
   }, [merchants, categories, merchantId, categoryId]);
 
+  function openEdit(c: Coupon) {
+    setEditingId(c.id);
+    setMerchantId(c.merchantId ?? c.merchant.id);
+    setCategoryId(c.categoryId ?? c.category.id);
+    setTitle(c.title);
+    setPrice(String(c.price));
+    setNoGeo(c.noGeo);
+    setCity(c.city ?? "Москва");
+    setConditionsHtml(c.conditionsHtml ?? defaultHtml);
+    setDescriptionHtml(c.descriptionHtml ?? defaultHtml);
+    setAddressHtml(c.addressHtml ?? defaultHtml);
+    setImageUrl(c.imageUrl ?? "");
+    setSubmitError("");
+    setShowForm(true);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitError("");
@@ -81,31 +103,35 @@ export default function AdminCouponsPage() {
     }
     setSubmitting(true);
     const token = getToken();
-    fetch(apiUrl("/api/coupons"), {
-      method: "POST",
+    const body = {
+      merchantId,
+      categoryId,
+      title: title.trim(),
+      price: priceNum,
+      noGeo,
+      city: noGeo ? null : city,
+      conditionsHtml: conditionsHtml || defaultHtml,
+      descriptionHtml: descriptionHtml || defaultHtml,
+      addressHtml: addressHtml || defaultHtml,
+      imageUrl: imageUrl.trim() || null,
+    };
+    const url = editingId ? `/api/coupons/${editingId}` : "/api/coupons";
+    const method = editingId ? "PATCH" : "POST";
+    fetch(apiUrl(url), {
+      method,
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       credentials: "include",
-      body: JSON.stringify({
-        merchantId,
-        categoryId,
-        title: title.trim(),
-        price: priceNum,
-        noGeo,
-        city: noGeo ? null : city,
-        conditionsHtml: conditionsHtml || defaultHtml,
-        descriptionHtml: descriptionHtml || defaultHtml,
-        addressHtml: addressHtml || defaultHtml,
-        imageUrl: imageUrl.trim() || null,
-      }),
+      body: JSON.stringify(body),
     })
       .then((r) => {
         if (!r.ok) return r.json().then((d) => { throw new Error((d as { error?: string }).error ?? "Ошибка"); });
         return r.json();
       })
       .then(() => {
+        setEditingId(null);
         setTitle("");
         setPrice("");
         setNoGeo(false);
@@ -141,7 +167,7 @@ export default function AdminCouponsPage() {
       {showForm && (
         <div id="view-shared-coupon-form" className="mb-6 max-w-[800px] rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
           <h2 className="border-b-2 border-slate-100 pb-5 text-2xl font-extrabold">
-            Создание нового купона
+            {editingId ? "Редактирование купона" : "Создание нового купона"}
           </h2>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
@@ -243,9 +269,9 @@ export default function AdminCouponsPage() {
             {submitError && <p className="text-sm text-red-600">{submitError}</p>}
             <div className="mt-4 flex gap-4">
               <button type="submit" disabled={submitting} className="rounded-lg bg-primary py-4 px-8 font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50">
-                {submitting ? "Сохранение…" : "Сохранить изменения"}
+                {submitting ? "Сохранение…" : editingId ? "Сохранить изменения" : "Создать"}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setSubmitError(""); }} className="rounded-lg border-2 border-slate-200 bg-transparent py-4 px-8 font-semibold text-slate-500">
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setSubmitError(""); }} className="rounded-lg border-2 border-slate-200 bg-transparent py-4 px-8 font-semibold text-slate-500">
                 Отмена
               </button>
             </div>
@@ -262,6 +288,7 @@ export default function AdminCouponsPage() {
               <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Название</th>
               <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Цена</th>
               <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">ГЕО</th>
+              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -274,6 +301,11 @@ export default function AdminCouponsPage() {
                 <td className="max-w-[200px] truncate px-4 py-3 font-medium" title={c.title}>{c.title}</td>
                 <td className="px-4 py-3 font-semibold">{c.price} ₽</td>
                 <td className="px-4 py-3 text-sm">{c.noGeo ? "Все города" : c.city ?? "—"}</td>
+                <td className="px-4 py-3">
+                  <button type="button" onClick={() => openEdit(c)} className="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary/90">
+                    Изменить
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

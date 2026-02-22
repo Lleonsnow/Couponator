@@ -35,7 +35,16 @@ export default function AdminLayout({
       .catch(() => router.replace("/login"));
   }, [router]);
 
-  if (!ok) return <div className="flex min-h-screen items-center justify-center">Проверка доступа...</div>;
+  if (!ok) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="animate-page-in py-24 text-center">
+          <div className="admin-loader-spinner" />
+          <p className="text-slate-500 font-semibold">Вход в панель управления...</p>
+        </div>
+      </div>
+    );
+  }
 
   const nav = [
     { href: "/admin", label: "Дашборд", icon: "📊" },

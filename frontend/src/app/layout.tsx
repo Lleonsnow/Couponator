@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CityProvider } from "@/context/CityContext";
 import { Footer } from "@/components/Footer";
+import { PageTransition } from "@/components/PageTransition";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default function RootLayout({
     <html lang="ru">
       <body className="flex min-h-screen flex-col">
         <CityProvider>
-          {children}
+          <PageTransition>{children}</PageTransition>
           <Footer />
         </CityProvider>
       </body>

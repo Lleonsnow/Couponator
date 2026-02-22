@@ -11,11 +11,36 @@ function getToken(): string | null {
   return m ? m[1].trim() : null;
 }
 
+const CYRILLIC_TO_LATIN: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z",
+  и: "i", й: "j", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
+  с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "c", ч: "ch", ш: "sh", щ: "shch",
+  ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+};
+
+function transliterate(text: string): string {
+  return text
+    .toLowerCase()
+    .split("")
+    .map((c) => CYRILLIC_TO_LATIN[c] ?? (c >= "а" && c <= "я" ? "" : c))
+    .join("");
+}
+
+function slugify(name: string): string {
+  const transliterated = transliterate(name);
+  return transliterated
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-|-$/g, "")
+    || "";
+}
+
 export default function AdminMerchantsPage() {
   const [list, setList] = useState<Merchant[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitError, setSubmitError] = useState("");
@@ -46,7 +71,7 @@ export default function AdminMerchantsPage() {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       credentials: "include",
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, slug: slug.trim() || undefined }),
     })
       .then((r) => {
         if (!r.ok) return r.json().then((d) => { throw new Error((d as { error?: string }).error ?? "Ошибка"); });
@@ -54,6 +79,8 @@ export default function AdminMerchantsPage() {
       })
       .then(() => {
         setName("");
+        setSlug("");
+        setSlugTouched(false);
         setEmail("");
         setPassword("");
         setShowForm(false);
@@ -91,9 +118,26 @@ export default function AdminMerchantsPage() {
               <input
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setName(v);
+                  if (!slugTouched) setSlug(slugify(v));
+                }}
                 className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-3.5"
                 required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold">Slug</label>
+              <input
+                type="text"
+                value={slug}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setSlug(e.target.value);
+                }}
+                placeholder="url-slug"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-3.5 font-mono text-sm"
               />
             </div>
             <div>
