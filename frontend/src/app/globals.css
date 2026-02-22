@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --container: 1320px;
+}
+
+body {
+  @apply min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased;
+}

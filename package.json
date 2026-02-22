@@ -1,0 +1,13 @@
+{
+  "name": "coupon-platform",
+  "private": true,
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:build": "docker compose build",
+    "docker:down": "docker compose down"
+  },
+  "packageManager": "pnpm@9.14.2",
+  "engines": {
+    "node": ">=20"
+  }
+}
