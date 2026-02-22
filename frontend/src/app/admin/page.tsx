@@ -7,41 +7,29 @@ export default function AdminPage() {
   const [stats, setStats] = useState<{ merchants: number; coupons: number; turnover: number } | null>(null);
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    const opts: RequestInit = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    Promise.all([
-      fetch(apiUrl("/api/merchants"), opts).then((r) => r.json()),
-      fetch(apiUrl("/api/coupons"), opts).then((r) => r.json()),
-      fetch(apiUrl("/api/transactions"), opts).then((r) => r.json()),
-    ])
-      .then(([merchants, coupons, transactions]) => {
-        const turnover = (transactions as { amount: number }[]).reduce((s, t) => s + t.amount, 0);
-        setStats({
-          merchants: (merchants as unknown[]).length,
-          coupons: (coupons as unknown[]).length,
-          turnover,
-        });
-      })
+    fetch(apiUrl("/api/admin/stats"), { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r)))
+      .then((data: { merchants: number; coupons: number; turnover: number }) => setStats(data))
       .catch(() => setStats({ merchants: 0, coupons: 0, turnover: 0 }));
   }, []);
 
   if (!stats) return <p className="text-slate-500">Загрузка...</p>;
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-extrabold">Глобальная статистика</h1>
+    <div id="sa-view-dash">
+      <h2 className="mt-0 mb-6 font-extrabold">Глобальная статистика</h2>
       <div className="grid gap-6 sm:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
           <p className="text-sm font-semibold text-slate-500">Общий оборот</p>
-          <p className="mt-1 text-2xl font-extrabold text-emerald-600">{stats.turnover.toLocaleString("ru")} ₽</p>
+          <p className="mt-2 text-3xl font-extrabold text-emerald-600">{stats.turnover.toLocaleString("ru")} ₽</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
           <p className="text-sm font-semibold text-slate-500">Мерчантов</p>
-          <p className="mt-1 text-2xl font-extrabold text-primary">{stats.merchants}</p>
+          <p id="saStatMerch" className="mt-2 text-3xl font-extrabold text-primary">{stats.merchants}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
           <p className="text-sm font-semibold text-slate-500">Всего купонов</p>
-          <p className="mt-1 text-2xl font-extrabold text-primary">{stats.coupons}</p>
+          <p id="saStatCoupons" className="mt-2 text-3xl font-extrabold text-primary">{stats.coupons}</p>
         </div>
       </div>
     </div>

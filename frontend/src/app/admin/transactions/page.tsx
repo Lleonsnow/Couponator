@@ -8,8 +8,8 @@ type Tx = {
   amount: number;
   status: string;
   createdAt: string;
-  user: { email: string };
-  coupon: { title: string; merchant: { name: string } };
+  user: { email: string } | null;
+  coupon: { title: string; merchant: { name: string } } | null;
 };
 
 export default function AdminTransactionsPage() {
@@ -54,9 +54,9 @@ export default function AdminTransactionsPage() {
               <tr key={t.id} className="border-b border-slate-100">
                 <td className="px-4 py-3 text-sm text-slate-500">{t.id.slice(0, 8)}</td>
                 <td className="px-4 py-3 text-sm">{new Date(t.createdAt).toLocaleString("ru")}</td>
-                <td className="px-4 py-3 text-sm">{t.user.email}</td>
-                <td className="px-4 py-3 text-sm">{t.coupon.merchant.name}</td>
-                <td className="max-w-[180px] truncate px-4 py-3 text-sm" title={t.coupon.title}>{t.coupon.title}</td>
+                <td className="px-4 py-3 text-sm">{t.user?.email ?? "—"}</td>
+                <td className="px-4 py-3 text-sm">{t.coupon?.merchant?.name ?? "—"}</td>
+                <td className="max-w-[180px] truncate px-4 py-3 text-sm" title={t.coupon?.title}>{t.coupon?.title ?? "—"}</td>
                 <td className="px-4 py-3 font-semibold">{t.amount} ₽</td>
                 <td className="px-4 py-3">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
