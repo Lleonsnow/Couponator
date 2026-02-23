@@ -29,12 +29,12 @@ export default function PromocodesPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[var(--container)] px-5 py-8">
-        <h1 className="mb-2 text-3xl font-extrabold">Бесплатные промокоды</h1>
-        <p className="mb-8 text-slate-500">
+      <main className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-6 sm:py-8">
+        <h1 className="mb-2 text-2xl sm:text-3xl font-extrabold">Бесплатные промокоды</h1>
+        <p className="mb-6 sm:mb-8 text-sm sm:text-base text-slate-500">
           Скопируйте промокод и используйте его при оформлении заказа на сайте партнера.
         </p>
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
           {list.map((p) => (
             <div
               key={p.id}

@@ -8,6 +8,12 @@
   --muted: #64748b;
   --primary: #3b82f6;
   --container: 1320px;
+  --container-padding: 1rem;
+}
+@media (min-width: 640px) {
+  :root {
+    --container-padding: 1.25rem;
+  }
 }
 
 body {

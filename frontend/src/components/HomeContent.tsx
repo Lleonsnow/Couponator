@@ -17,7 +17,7 @@ export function HomeContent() {
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </section>
       <CategoryTabs selectedSlug={categorySlug} onSelect={setCategorySlug} />
-      <div className="mt-6 flex gap-8">
+      <div className="mt-4 sm:mt-6 flex gap-6 lg:gap-8">
         <div className="min-w-0 flex-1">
           <CouponGrid categorySlug={categorySlug} searchQuery={searchQuery} />
         </div>

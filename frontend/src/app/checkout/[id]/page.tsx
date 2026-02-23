@@ -66,8 +66,8 @@ export default function CheckoutPage() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-[var(--container)] px-5 py-12 text-center">
-          <p className="text-slate-500">Укажите сумму</p>
+        <main className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-8 sm:py-12 text-center">
+          <p className="text-slate-500 text-sm sm:text-base">Укажите сумму</p>
           <Link href="/" className="mt-4 inline-block font-semibold text-primary">На главную</Link>
         </main>
       </>
@@ -79,8 +79,8 @@ export default function CheckoutPage() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-[var(--container)] px-5 py-12 text-center">
-          <p className="text-slate-500">Купон не найден</p>
+        <main className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-8 sm:py-12 text-center">
+          <p className="text-slate-500 text-sm sm:text-base">Купон не найден</p>
           <Link href="/" className="mt-4 inline-block font-semibold text-primary">На главную</Link>
         </main>
       </>
@@ -91,8 +91,8 @@ export default function CheckoutPage() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-[var(--container)] px-5 py-12 text-center">
-          <p className="text-slate-500">Сумма меньше минимальной ({coupon.price} ₽)</p>
+        <main className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-8 sm:py-12 text-center">
+          <p className="text-slate-500 text-sm sm:text-base">Сумма меньше минимальной ({coupon.price} ₽)</p>
           <Link href={`/coupon/${id}`} className="mt-4 inline-block font-semibold text-primary">К купону</Link>
         </main>
       </>
@@ -102,9 +102,9 @@ export default function CheckoutPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[600px] px-5 py-8">
-        <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
-          <h1 className="mb-6 border-b-2 border-slate-100 pb-4 text-2xl font-extrabold">Детали заказа</h1>
+      <main className="mx-auto max-w-[600px] px-4 sm:px-5 py-6 sm:py-8">
+        <div className="rounded-xl sm:rounded-2xl border border-slate-100 bg-white p-5 sm:p-8 shadow-sm">
+          <h1 className="mb-4 sm:mb-6 border-b-2 border-slate-100 pb-3 sm:pb-4 text-xl sm:text-2xl font-extrabold">Детали заказа</h1>
           <div className="mb-4 flex justify-between gap-4 border-b border-slate-100 py-4">
             <span className="text-slate-500">Услуга:</span>
             <strong className="max-w-[60%] text-right">{coupon.title}</strong>
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
             type="button"
             onClick={pay}
             disabled={loading}
-            className="w-full rounded-xl bg-primary py-4 text-lg font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50"
+            className="w-full rounded-xl bg-primary py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50 min-h-[48px]"
           >
             {loading ? "Обработка..." : `Оплатить ${amount} ₽`}
           </button>

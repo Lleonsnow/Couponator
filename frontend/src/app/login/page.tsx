@@ -59,18 +59,18 @@ function LoginForm() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-md px-5 py-12">
+      <main className="mx-auto max-w-md px-4 sm:px-5 py-8 sm:py-12">
       <form
         onSubmit={onSubmit}
-        className="rounded-2xl border border-slate-100 bg-white p-8 shadow-md"
+        className="rounded-xl sm:rounded-2xl border border-slate-100 bg-white p-5 sm:p-8 shadow-md"
       >
-        <h1 className="mb-6 text-center text-2xl font-extrabold">Вход</h1>
+        <h1 className="mb-4 sm:mb-6 text-center text-xl sm:text-2xl font-extrabold">Вход</h1>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-primary"
+          className="mb-3 sm:mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 text-base outline-none focus:border-primary min-h-[48px]"
           required
         />
         <input
@@ -78,13 +78,13 @@ function LoginForm() {
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-primary"
+          className="mb-3 sm:mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 text-base outline-none focus:border-primary min-h-[48px]"
           required
         />
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {error && <p className="mb-3 sm:mb-4 text-sm text-red-600">{error}</p>}
         <button
           type="submit"
-          className="w-full rounded-lg bg-primary py-3 font-semibold text-white transition hover:bg-primary-hover"
+          className="w-full rounded-lg bg-primary py-3 font-semibold text-white transition hover:bg-primary-hover min-h-[48px]"
         >
           Войти
         </button>

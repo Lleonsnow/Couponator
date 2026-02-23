@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-slate-200 bg-white py-10">
-      <div className="mx-auto max-w-[var(--container)] px-5">
-        <nav className="mb-6 flex flex-wrap justify-center gap-8">
+    <footer className="mt-auto border-t border-slate-200 bg-white py-8 sm:py-10">
+      <div className="mx-auto max-w-[var(--container)] px-4 sm:px-5">
+        <nav className="mb-4 sm:mb-6 flex flex-wrap justify-center gap-4 sm:gap-8">
           <Link href="/about" className="font-medium text-slate-500 transition hover:text-primary">
             О компании
           </Link>
@@ -21,7 +21,7 @@ export function Footer() {
             Мерчантам
           </Link>
         </nav>
-        <p className="text-center text-sm text-slate-400">
+        <p className="text-center text-xs sm:text-sm text-slate-400">
           © 2026 Купонатор. Все права защищены.
         </p>
       </div>

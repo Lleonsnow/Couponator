@@ -5,7 +5,7 @@ export default async function TransactionPage({
 }) {
   const { id } = await params;
   return (
-    <div className="mx-auto max-w-[var(--container)] px-5 py-6">
+    <div className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-4 sm:py-6">
       <p>Результат транзакции {id}</p>
     </div>
   );

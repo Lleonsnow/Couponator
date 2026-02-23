@@ -35,7 +35,7 @@ export default function PromocodePage() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-[var(--container)] px-5 py-12 text-center">
+        <main className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-8 sm:py-12 text-center">
           <p className="text-slate-500">Промокод не найден</p>
           <Link href="/promocodes" className="mt-4 inline-block text-primary font-semibold">
             К списку промокодов
@@ -47,7 +47,7 @@ export default function PromocodePage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[600px] px-5 py-8">
+      <main className="mx-auto max-w-[600px] px-4 sm:px-5 py-6 sm:py-8">
         <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6 flex gap-4">
             <img

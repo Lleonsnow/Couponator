@@ -44,27 +44,27 @@ export function CategoryTabs({
 
   if (loading) {
     return (
-      <div className="flex gap-5 overflow-x-auto py-6">
-        <div className="h-[68px] w-[68px] shrink-0 animate-pulse rounded-xl bg-slate-100" />
-        <div className="h-[68px] w-[68px] shrink-0 animate-pulse rounded-xl bg-slate-100" />
-        <div className="h-[68px] w-[68px] shrink-0 animate-pulse rounded-xl bg-slate-100" />
+      <div className="flex gap-3 sm:gap-5 overflow-x-auto py-4 sm:py-6 scrollbar-none">
+        <div className="h-14 w-14 sm:h-[68px] sm:w-[68px] shrink-0 animate-pulse rounded-xl bg-slate-100" />
+        <div className="h-14 w-14 sm:h-[68px] sm:w-[68px] shrink-0 animate-pulse rounded-xl bg-slate-100" />
+        <div className="h-14 w-14 sm:h-[68px] sm:w-[68px] shrink-0 animate-pulse rounded-xl bg-slate-100" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-nowrap gap-5 overflow-x-auto py-6 scrollbar-none">
+    <div className="flex flex-nowrap gap-3 sm:gap-5 overflow-x-auto py-4 sm:py-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
       <button
         type="button"
         onClick={() => onSelect(null)}
-        className={`flex min-w-[80px] shrink-0 flex-col items-center gap-3 transition hover:-translate-y-1 ${
+        className={`flex min-w-[72px] sm:min-w-[80px] shrink-0 flex-col items-center gap-2 sm:gap-3 transition hover:-translate-y-1 ${
           !selectedSlug ? "opacity-100" : "opacity-70 hover:opacity-100"
         }`}
       >
-        <span className="flex h-[68px] w-[68px] items-center justify-center rounded-xl bg-white text-2xl shadow-sm transition hover:bg-primary/10">
+        <span className="flex h-14 w-14 sm:h-[68px] sm:w-[68px] items-center justify-center rounded-xl bg-white text-xl sm:text-2xl shadow-sm transition hover:bg-primary/10">
           Все
         </span>
-        <span className="text-center text-sm font-semibold">Все</span>
+        <span className="text-center text-xs sm:text-sm font-semibold">Все</span>
       </button>
       {list.map((c) => {
         const active = selectedSlug === c.slug;
@@ -73,18 +73,18 @@ export function CategoryTabs({
             key={c.id}
             type="button"
             onClick={() => onSelect(active ? null : c.slug)}
-            className={`flex min-w-[80px] shrink-0 flex-col items-center gap-3 transition hover:-translate-y-1 ${
+            className={`flex min-w-[72px] sm:min-w-[80px] shrink-0 flex-col items-center gap-2 sm:gap-3 transition hover:-translate-y-1 ${
               active ? "opacity-100" : "opacity-70 hover:opacity-100"
             }`}
           >
             <span
-              className={`flex h-[68px] w-[68px] items-center justify-center rounded-xl bg-white text-3xl shadow-sm transition hover:bg-primary/10 ${
+              className={`flex h-14 w-14 sm:h-[68px] sm:w-[68px] items-center justify-center rounded-xl bg-white text-2xl sm:text-3xl shadow-sm transition hover:bg-primary/10 ${
                 active ? "bg-primary/10 ring-2 ring-primary" : ""
               }`}
             >
               {SLUG_ICON[c.slug] ?? "📋"}
             </span>
-            <span className="text-center text-sm font-semibold">{c.name}</span>
+            <span className="text-center text-xs sm:text-sm font-semibold">{c.name}</span>
           </button>
         );
       })}

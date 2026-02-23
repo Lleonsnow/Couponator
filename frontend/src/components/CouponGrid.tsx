@@ -43,16 +43,16 @@ export function CouponGrid({
     return matchCity && matchCat && matchSearch;
   });
 
-  if (loading) return <div className="py-8 text-center text-slate-500">Загрузка...</div>;
+  if (loading) return <div className="py-6 sm:py-8 text-center text-sm sm:text-base text-slate-500">Загрузка...</div>;
   if (filtered.length === 0)
     return (
-      <div className="rounded-2xl bg-white py-16 text-center text-slate-500">
+      <div className="rounded-xl sm:rounded-2xl bg-white py-10 sm:py-16 text-center text-sm sm:text-base text-slate-500 px-4">
         {q ? "По вашему запросу ничего не найдено" : categorySlug ? "В этой категории купонов пока нет" : "Купонов пока нет"}
       </div>
     );
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
       {filtered.map((c) => (
         <CouponCard
           key={c.id}

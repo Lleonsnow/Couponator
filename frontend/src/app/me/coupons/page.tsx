@@ -43,7 +43,7 @@ export default function MyCouponsPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[var(--container)] px-5 py-8">
+      <main className="mx-auto max-w-[var(--container)] px-4 sm:px-5 py-6 sm:py-8">
         <h1 className="mb-8 text-3xl font-extrabold">Мои покупки</h1>
         {loading ? (
           <p className="text-slate-500">Загрузка...</p>
