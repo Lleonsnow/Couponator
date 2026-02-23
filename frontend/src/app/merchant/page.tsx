@@ -23,15 +23,15 @@ export default function MerchantPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-extrabold">Сводка за месяц</h1>
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-          <p className="text-sm font-semibold text-slate-500">Сумма продаж</p>
-          <p className="mt-1 text-2xl font-extrabold text-primary">{stats.turnover.toLocaleString("ru")} ₽</p>
+      <h1 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-extrabold">Сводка за месяц</h1>
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <p className="text-xs sm:text-sm font-semibold text-slate-500">Сумма продаж</p>
+          <p className="mt-1 text-xl sm:text-2xl font-extrabold text-primary">{stats.turnover.toLocaleString("ru")} ₽</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-          <p className="text-sm font-semibold text-slate-500">Активные купоны</p>
-          <p className="mt-1 text-2xl font-extrabold text-primary">{stats.coupons}</p>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <p className="text-xs sm:text-sm font-semibold text-slate-500">Активные купоны</p>
+          <p className="mt-1 text-xl sm:text-2xl font-extrabold text-primary">{stats.coupons}</p>
         </div>
       </div>
     </div>

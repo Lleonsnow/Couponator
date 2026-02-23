@@ -139,13 +139,13 @@ export default function AdminCouponsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold">Все купоны платформы</h1>
+      <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl sm:text-2xl font-extrabold">Все купоны платформы</h1>
         {!showForm && (
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="rounded-xl bg-primary px-5 py-2.5 font-semibold text-white transition hover:bg-primary/90"
+            className="rounded-xl bg-primary px-4 py-2.5 sm:px-5 text-sm sm:text-base font-semibold text-white transition hover:bg-primary/90 w-full sm:w-auto min-h-[44px]"
           >
             + Создать купон
           </button>
@@ -153,17 +153,17 @@ export default function AdminCouponsPage() {
       </div>
 
       {showForm && (
-        <div id="view-shared-coupon-form" className="mb-6 max-w-[800px] rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="border-b-2 border-slate-100 pb-5 text-2xl font-extrabold">
+        <div id="view-shared-coupon-form" className="mb-4 sm:mb-6 max-w-full sm:max-w-[800px] rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm overflow-x-hidden">
+          <h2 className="border-b-2 border-slate-100 pb-4 sm:pb-5 text-lg sm:text-2xl font-extrabold">
             {editingId ? "Редактирование купона" : "Создание нового купона"}
           </h2>
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-500">Привязать к мерчанту</label>
               <select
                 value={merchantId}
                 onChange={(e) => setMerchantId(e.target.value)}
-                className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-slate-50 px-4"
+                className="mt-1 min-h-[48px] w-full rounded-lg border border-slate-300 bg-slate-50 px-3 sm:px-4"
                 required
               >
                 {merchants.map((m) => (
@@ -177,28 +177,28 @@ export default function AdminCouponsPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 text-base sm:text-lg font-semibold"
                 required
               />
             </div>
-            <div className="flex flex-wrap gap-5">
-              <div className="min-w-[200px] flex-1">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
+              <div className="min-w-0 flex-1">
                 <label className="block text-sm font-semibold text-slate-500">Базовая цена (₽)</label>
                 <input
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   min={0}
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-3 font-bold text-primary"
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 font-bold text-primary min-h-[48px]"
                   required
                 />
               </div>
-              <div className="min-w-[200px] flex-1">
+              <div className="min-w-0 flex-1">
                 <label className="block text-sm font-semibold text-slate-500">Категория</label>
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-slate-50 px-4"
+                  className="mt-1 min-h-[48px] w-full rounded-lg border border-slate-300 bg-slate-50 px-3 sm:px-4"
                   required
                 >
                   {categories.map((c) => (
@@ -207,7 +207,7 @@ export default function AdminCouponsPage() {
                 </select>
               </div>
             </div>
-            <div className="rounded-xl border border-blue-200 bg-primary/10 p-5">
+            <div className="rounded-xl border border-blue-200 bg-primary/10 p-4 sm:p-5">
               <label className="mb-4 flex cursor-pointer items-center gap-2.5 font-semibold text-primary">
                 <input
                   type="checkbox"
@@ -224,7 +224,7 @@ export default function AdminCouponsPage() {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   disabled={noGeo}
-                  className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-4"
+                  className="mt-1 min-h-[48px] w-full rounded-lg border border-slate-300 bg-white px-3 sm:px-4"
                 >
                   {CITIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -239,27 +239,27 @@ export default function AdminCouponsPage() {
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://..."
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-3"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 min-h-[48px]"
               />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-500">Условия (HTML)</label>
-              <textarea value={conditionsHtml} onChange={(e) => setConditionsHtml(e.target.value)} className="mt-1 h-[100px] w-full resize-y rounded-lg border border-slate-300 px-4 py-3 leading-relaxed" />
+              <textarea value={conditionsHtml} onChange={(e) => setConditionsHtml(e.target.value)} className="mt-1 min-h-[80px] sm:h-[100px] w-full resize-y rounded-lg border border-slate-300 px-3 sm:px-4 py-3 leading-relaxed" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-500">Описание (HTML)</label>
-              <textarea value={descriptionHtml} onChange={(e) => setDescriptionHtml(e.target.value)} className="mt-1 h-[100px] w-full resize-y rounded-lg border border-slate-300 px-4 py-3 leading-relaxed" />
+              <textarea value={descriptionHtml} onChange={(e) => setDescriptionHtml(e.target.value)} className="mt-1 min-h-[80px] sm:h-[100px] w-full resize-y rounded-lg border border-slate-300 px-3 sm:px-4 py-3 leading-relaxed" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-500">Адреса (HTML)</label>
-              <textarea value={addressHtml} onChange={(e) => setAddressHtml(e.target.value)} className="mt-1 h-20 w-full resize-y rounded-lg border border-slate-300 px-4 py-3 leading-relaxed" />
+              <textarea value={addressHtml} onChange={(e) => setAddressHtml(e.target.value)} className="mt-1 min-h-16 h-20 w-full resize-y rounded-lg border border-slate-300 px-3 sm:px-4 py-3 leading-relaxed" />
             </div>
             {submitError && <p className="text-sm text-red-600">{submitError}</p>}
-            <div className="mt-4 flex gap-4">
-              <button type="submit" disabled={submitting} className="rounded-lg bg-primary py-4 px-8 font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50">
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-4">
+              <button type="submit" disabled={submitting} className="rounded-lg bg-primary py-3 sm:py-4 px-6 sm:px-8 font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50 min-h-[48px]">
                 {submitting ? "Сохранение…" : editingId ? "Сохранить изменения" : "Создать"}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setSubmitError(""); }} className="rounded-lg border-2 border-slate-200 bg-transparent py-4 px-8 font-semibold text-slate-500">
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setSubmitError(""); }} className="rounded-lg border-2 border-slate-200 bg-transparent py-3 sm:py-4 px-6 sm:px-8 font-semibold text-slate-500 min-h-[48px]">
                 Отмена
               </button>
             </div>
@@ -267,30 +267,30 @@ export default function AdminCouponsPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200">
-        <table className="w-full min-w-[600px] border-collapse">
+      <div className="overflow-x-auto -mx-4 sm:mx-0 rounded-lg border border-slate-200">
+        <table className="w-full min-w-[480px] border-collapse">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Фото</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Мерчант</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Название</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Цена</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">ГЕО</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Действия</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Фото</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500 hidden md:table-cell">Мерчант</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Название</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Цена</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500 hidden sm:table-cell">ГЕО</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Действия</th>
             </tr>
           </thead>
           <tbody>
             {list.map((c) => (
               <tr key={c.id} className="border-b border-slate-100">
-                <td className="px-4 py-2">
-                  <img src={c.imageUrl ?? ""} alt="" className="h-10 w-16 rounded object-cover" />
+                <td className="px-2 py-2 sm:px-4 sm:py-2">
+                  <img src={c.imageUrl ?? ""} alt="" className="h-8 w-12 sm:h-10 sm:w-16 rounded object-cover" />
                 </td>
-                <td className="px-4 py-3 text-sm font-medium">{c.merchant.name}</td>
-                <td className="max-w-[200px] truncate px-4 py-3 font-medium" title={c.title}>{c.title}</td>
-                <td className="px-4 py-3 font-semibold">{c.price} ₽</td>
-                <td className="px-4 py-3 text-sm">{c.noGeo ? "Все города" : c.city ?? "—"}</td>
-                <td className="px-4 py-3">
-                  <button type="button" onClick={() => openEdit(c)} className="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary/90">
+                <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium hidden md:table-cell">{c.merchant.name}</td>
+                <td className="max-w-[140px] sm:max-w-[200px] truncate px-2 py-2 sm:px-4 sm:py-3 text-sm font-medium" title={c.title}>{c.title}</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{c.price} ₽</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{c.noGeo ? "Все города" : c.city ?? "—"}</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3">
+                  <button type="button" onClick={() => openEdit(c)} className="rounded-lg bg-primary px-2.5 py-1.5 sm:px-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary/90 min-h-[36px]">
                     Изменить
                   </button>
                 </td>
@@ -299,7 +299,7 @@ export default function AdminCouponsPage() {
           </tbody>
         </table>
       </div>
-      {list.length === 0 && !showForm && <p className="py-8 text-center text-slate-500">Купонов пока нет</p>}
+      {list.length === 0 && !showForm && <p className="py-6 sm:py-8 text-center text-sm text-slate-500">Купонов пока нет</p>}
     </div>
   );
 }

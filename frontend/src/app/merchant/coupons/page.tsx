@@ -29,32 +29,32 @@ export default function MerchantCouponsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-extrabold">Ваши купоны</h1>
-      <div className="overflow-x-auto rounded-lg border border-slate-200">
-        <table className="w-full min-w-[500px] border-collapse">
+      <h1 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-extrabold">Ваши купоны</h1>
+      <div className="overflow-x-auto -mx-4 sm:mx-0 rounded-lg border border-slate-200">
+        <table className="w-full min-w-[320px] border-collapse">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Фото</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Название</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">Мин. цена</th>
-              <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-500">ГЕО</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Фото</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Название</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Мин. цена</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500 hidden sm:table-cell">ГЕО</th>
             </tr>
           </thead>
           <tbody>
             {list.map((c) => (
               <tr key={c.id} className="border-b border-slate-100">
-                <td className="px-4 py-2">
-                  <img src={c.imageUrl ?? ""} alt="" className="h-10 w-16 rounded object-cover" />
+                <td className="px-2 py-2 sm:px-4 sm:py-2">
+                  <img src={c.imageUrl ?? ""} alt="" className="h-8 w-12 sm:h-10 sm:w-16 rounded object-cover" />
                 </td>
-                <td className="max-w-[240px] truncate px-4 py-3 font-medium" title={c.title}>{c.title}</td>
-                <td className="px-4 py-3 font-semibold">{c.price} ₽</td>
-                <td className="px-4 py-3 text-sm">{c.noGeo ? "Все города" : c.city ?? "—"}</td>
+                <td className="max-w-[140px] sm:max-w-[240px] truncate px-2 py-2 sm:px-4 sm:py-3 text-sm font-medium" title={c.title}>{c.title}</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{c.price} ₽</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{c.noGeo ? "Все города" : c.city ?? "—"}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {list.length === 0 && <p className="py-8 text-center text-slate-500">Купонов пока нет</p>}
+      {list.length === 0 && <p className="py-6 sm:py-8 text-center text-sm text-slate-500">Купонов пока нет</p>}
     </div>
   );
 }
