@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import DOMPurify from "dompurify";
 import { Header } from "@/components/Header";
 import { apiUrl } from "@/lib/api";
 
@@ -41,8 +42,9 @@ export default function CouponPage() {
         return Promise.all([Promise.resolve(c), fetch(apiUrl("/api/coupons")).then((r) => r.json())]);
       })
       .then(([c, list]: [Coupon, Coupon[]]) => {
-        const same = list.filter((x) => x.category.slug === c.category.slug && x.id !== c.id);
-        const other = list.filter((x) => x.id !== c.id && !same.find((s) => s.id === x.id));
+        const arr = Array.isArray(list) ? list : [];
+        const same = arr.filter((x) => x.category?.slug === c.category?.slug && x.id !== c.id);
+        const other = arr.filter((x) => x.id !== c.id && !same.find((s) => s.id === x.id));
         setSimilar([...same.slice(0, 3), ...other.slice(0, Math.max(0, 3 - same.length))].slice(0, 3));
       })
       .catch(() => setCoupon(null));
@@ -148,10 +150,10 @@ export default function CouponPage() {
               ))}
             </div>
             <div className="prose prose-slate max-w-none text-slate-600">
-              {tab === "cond" && <div dangerouslySetInnerHTML={{ __html: coupon.conditionsHtml }} />}
-              {tab === "desc" && <div dangerouslySetInnerHTML={{ __html: coupon.descriptionHtml }} />}
+              {tab === "cond" && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(coupon.conditionsHtml) }} />}
+              {tab === "desc" && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(coupon.descriptionHtml) }} />}
               {tab === "gar" && <p>Все услуги сертифицированы. Возврат средств возможен в течение 14 дней.</p>}
-              {tab === "addr" && <div dangerouslySetInnerHTML={{ __html: coupon.addressHtml }} />}
+              {tab === "addr" && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(coupon.addressHtml) }} />}
               {tab === "rev" && <p>Отзывов пока нет.</p>}
             </div>
           </div>

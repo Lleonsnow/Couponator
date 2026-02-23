@@ -1,23 +1,30 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { TransactionStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
+const bodySchema = z.object({
+  couponId: z.string().cuid(),
+  amount: z.number().int().min(1).max(10_000_000),
+});
+
 export async function POST(req: Request) {
   const session = await getSession(req);
   if (!session?.sub) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: { couponId?: string; amount?: number };
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
-  const { couponId, amount } = body;
-  if (!couponId || typeof amount !== "number" || amount < 1)
-    return NextResponse.json({ error: "couponId and amount required" }, { status: 400 });
+  const parsed = bodySchema.safeParse(raw);
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+  const { couponId, amount } = parsed.data;
 
   const coupon = await prisma.coupon.findUnique({
     where: { id: couponId, isActive: true },
