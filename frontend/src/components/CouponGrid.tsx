@@ -30,7 +30,7 @@ export function CouponGrid({
   useEffect(() => {
     fetch(apiUrl("/api/coupons"))
       .then((r) => r.json())
-      .then(setList)
+      .then((data) => setList(Array.isArray(data) ? data : []))
       .catch(() => setList([]))
       .finally(() => setLoading(false));
   }, []);

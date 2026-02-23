@@ -16,10 +16,11 @@ export function SidebarStores() {
   useEffect(() => {
     fetch(apiUrl("/api/promocodes"))
       .then((r) => r.json())
-      .then((data: Promo[]) => {
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : [];
         const seen = new Set<string>();
         const uniq: Promo[] = [];
-        for (const p of data) {
+        for (const p of arr) {
           if (!seen.has(p.store)) {
             seen.add(p.store);
             uniq.push(p);

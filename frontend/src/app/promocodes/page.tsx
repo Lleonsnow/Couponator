@@ -22,7 +22,7 @@ export default function PromocodesPage() {
   useEffect(() => {
     fetch(apiUrl("/api/promocodes"))
       .then((r) => r.json())
-      .then(setList)
+      .then((data) => setList(Array.isArray(data) ? data : []))
       .catch(() => setList([]));
   }, []);
 

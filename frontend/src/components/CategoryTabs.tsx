@@ -37,7 +37,7 @@ export function CategoryTabs({
     setLoading(true);
     fetch(apiUrl("/api/categories"), { credentials: "include" })
       .then((r) => r.json())
-      .then(setList)
+      .then((data) => setList(Array.isArray(data) ? data : []))
       .catch(() => setList([]))
       .finally(() => setLoading(false));
   }, []);

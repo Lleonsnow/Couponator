@@ -18,7 +18,7 @@ export function SidebarPromos() {
   useEffect(() => {
     fetch(apiUrl("/api/promocodes"))
       .then((r) => r.json())
-      .then((data: Promo[]) => setList(data.slice(0, 3)))
+      .then((data) => setList(Array.isArray(data) ? data.slice(0, 3) : []))
       .catch(() => setList([]));
   }, []);
 
