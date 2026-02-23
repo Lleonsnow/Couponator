@@ -1,9 +1,15 @@
 import { SignJWT, jwtVerify } from "jose";
 import { Role } from "@prisma/client";
 
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "dev-secret-change-in-production"
-);
+let _secret: Uint8Array | null = null;
+function getSecret(): Uint8Array {
+  if (_secret) return _secret;
+  const secret = process.env.JWT_SECRET;
+  if (process.env.NODE_ENV === "production" && !secret)
+    throw new Error("JWT_SECRET is required in production");
+  _secret = new TextEncoder().encode(secret ?? "dev-secret-change-in-production");
+  return _secret;
+}
 
 export type Payload = {
   sub: string;
@@ -16,7 +22,7 @@ export async function signToken(payload: Payload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
-    .sign(SECRET);
+    .sign(getSecret());
 }
 
 function getTokenFromRequest(req: Request): string | null {
@@ -31,7 +37,7 @@ export async function getSession(req: Request): Promise<Payload | null> {
   const token = getTokenFromRequest(req);
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     return payload as unknown as Payload;
   } catch {
     return null;

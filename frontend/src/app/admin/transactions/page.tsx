@@ -17,11 +17,7 @@ export default function AdminTransactionsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cookieMatch = document.cookie.match(/\btoken=([^;]+)/);
-    const token = cookieMatch ? cookieMatch[1].trim() : null;
-    const headers: Record<string, string> = {};
-    if (token) headers.Authorization = `Bearer ${token}`;
-    fetch(apiUrl("/api/transactions"), { headers, credentials: "include" })
+    fetch(apiUrl("/api/transactions"), { credentials: "include" })
       .then((r) => {
         if (!r.ok) return [];
         return r.json();

@@ -39,13 +39,9 @@ export default function CheckoutPage() {
     setError("");
     setLoading(true);
     try {
-      const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
       const res = await fetch(apiUrl("/api/checkout"), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ couponId: coupon.id, amount }),
       });

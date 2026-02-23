@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Header } from "@/components/Header";
 import { apiUrl } from "@/lib/api";
 
 function LoginForm() {
@@ -14,9 +15,7 @@ function LoginForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    const opts: RequestInit = token ? { headers: { Authorization: `Bearer ${token}` } } : { credentials: "include" };
-    fetch(apiUrl("/api/auth/me"), { ...opts, credentials: "include" })
+    fetch(apiUrl("/api/auth/me"), { credentials: "include" })
       .then((r) => r.json())
       .then((u: { role?: string | null }) => {
         if (u?.role === "ADMIN") router.replace("/admin");
@@ -29,29 +28,27 @@ function LoginForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    try {
+      try {
       const res = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError((data as { error?: string }).error ?? "Ошибка входа");
         return;
       }
-      const token = (data as { token?: string }).token;
       const role = (data as { user?: { role?: string } }).user?.role;
-      if (token) {
-        document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
-      }
+      const safeFrom = from && from.startsWith("/") && !from.startsWith("//") ? from : null;
       if (role === "ADMIN") {
         router.replace("/admin");
         router.refresh();
         return;
       }
       if (role === "MERCHANT") router.push("/merchant/coupons");
-      else if (from && from.startsWith("/")) router.push(from);
+      else if (safeFrom) router.push(safeFrom);
       else router.push("/");
       router.refresh();
     } catch {
@@ -60,7 +57,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-5 py-12">
+    <>
+      <Header />
+      <main className="mx-auto max-w-md px-5 py-12">
       <form
         onSubmit={onSubmit}
         className="rounded-2xl border border-slate-100 bg-white p-8 shadow-md"
@@ -95,7 +94,8 @@ function LoginForm() {
           </Link>
         </p>
       </form>
-    </div>
+      </main>
+    </>
   );
 }
 

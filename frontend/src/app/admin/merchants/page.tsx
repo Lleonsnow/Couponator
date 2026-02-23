@@ -5,12 +5,6 @@ import { apiUrl } from "@/lib/api";
 
 type Merchant = { id: string; name: string; slug: string };
 
-function getToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const m = document.cookie.match(/\btoken=([^;]+)/);
-  return m ? m[1].trim() : null;
-}
-
 const CYRILLIC_TO_LATIN: Record<string, string> = {
   а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z",
   и: "i", й: "j", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
@@ -47,8 +41,7 @@ export default function AdminMerchantsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(() => {
-    const token = getToken();
-    fetch(apiUrl("/api/merchants"), { headers: token ? { Authorization: `Bearer ${token}` } : {}, credentials: "include" })
+    fetch(apiUrl("/api/merchants"), { credentials: "include" })
       .then((r) => r.json())
       .then(setList)
       .catch(() => setList([]))
@@ -63,13 +56,9 @@ export default function AdminMerchantsPage() {
     e.preventDefault();
     setSubmitError("");
     setSubmitting(true);
-    const token = getToken();
     fetch(apiUrl("/api/merchants"), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ name, email, password, slug: slug.trim() || undefined }),
     })

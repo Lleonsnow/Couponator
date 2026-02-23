@@ -26,9 +26,7 @@ export default function MyCouponsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    const opts: RequestInit = token ? { headers: { Authorization: `Bearer ${token}` }, credentials: "include" } : { credentials: "include" };
-    fetch(apiUrl("/api/me/transactions"), opts)
+    fetch(apiUrl("/api/me/transactions"), { credentials: "include" })
       .then((r) => {
         if (r.status === 401) {
           router.replace("/login");

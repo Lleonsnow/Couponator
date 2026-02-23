@@ -17,8 +17,7 @@ export default function MerchantTransactionsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    fetch(apiUrl("/api/merchant/transactions"), { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+    fetch(apiUrl("/api/merchant/transactions"), { credentials: "include" })
       .then((r) => r.json())
       .then(setList)
       .catch(() => setList([]))

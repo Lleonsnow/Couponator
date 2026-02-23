@@ -17,11 +17,7 @@ export function Header() {
   const [cityOpen, setCityOpen] = useState(false);
 
   useEffect(() => {
-    const cookieMatch = document.cookie.match(/\btoken=([^;]+)/);
-    const token = cookieMatch ? cookieMatch[1].trim() : null;
-    const headers: Record<string, string> = {};
-    if (token) headers.Authorization = `Bearer ${token}`;
-    fetch(apiUrl("/api/auth/me"), { headers, credentials: "include" })
+    fetch(apiUrl("/api/auth/me"), { credentials: "include" })
       .then((r) => r.json())
       .then((data: { role?: string | null; email?: string }) => (data?.role ? (data as User) : null))
       .then(setUser)
@@ -29,8 +25,8 @@ export function Header() {
       .finally(() => setLoading(false));
   }, [pathname]);
 
-  function logout() {
-    document.cookie = "token=; path=/; max-age=0";
+  async function logout() {
+    await fetch(apiUrl("/api/auth/logout"), { method: "POST", credentials: "include" });
     setUser(null);
     router.push("/");
     router.refresh();

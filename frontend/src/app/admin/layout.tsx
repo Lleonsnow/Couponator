@@ -14,17 +14,9 @@ export default function AdminLayout({
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    const cookieMatch = document.cookie.match(/\btoken=([^;]+)/);
-    const token = cookieMatch ? cookieMatch[1].trim() : null;
-    const url = apiUrl("/api/auth/me");
-    const headers: Record<string, string> = {};
-    if (token) headers.Authorization = `Bearer ${token}`;
-    fetch(url, { method: "GET", headers, credentials: "include" })
+    fetch(apiUrl("/api/auth/me"), { credentials: "include" })
       .then((r) => {
-        if (r.status === 401) {
-          router.replace("/login");
-          return null;
-        }
+        if (r.status === 401) { router.replace("/login"); return null; }
         return r.json();
       })
       .then((data: { role?: string | null } | null) => {

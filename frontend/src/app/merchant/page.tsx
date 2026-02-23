@@ -7,8 +7,7 @@ export default function MerchantPage() {
   const [stats, setStats] = useState<{ coupons: number; turnover: number } | null>(null);
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    const opts: RequestInit = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+    const opts: RequestInit = { credentials: "include" };
     Promise.all([
       fetch(apiUrl("/api/merchant/coupons"), opts).then((r) => r.json()),
       fetch(apiUrl("/api/merchant/transactions"), opts).then((r) => r.json()),

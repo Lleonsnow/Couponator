@@ -23,12 +23,6 @@ type Coupon = {
 type Merchant = { id: string; name: string };
 type Category = { id: string; slug: string; name: string };
 
-function getToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const m = document.cookie.match(/\btoken=([^;]+)/);
-  return m ? m[1].trim() : null;
-}
-
 const defaultHtml = "<p></p>";
 
 export default function AdminCouponsPage() {
@@ -52,9 +46,7 @@ export default function AdminCouponsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(() => {
-    const token = getToken();
-    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-    const opts: RequestInit = { headers, credentials: "include" };
+    const opts: RequestInit = { credentials: "include" };
     Promise.all([
       fetch(apiUrl("/api/coupons"), opts).then((r) => r.json()).catch(() => []),
       fetch(apiUrl("/api/merchants"), opts).then((r) => r.json()).catch(() => []),
@@ -102,7 +94,6 @@ export default function AdminCouponsPage() {
       return;
     }
     setSubmitting(true);
-    const token = getToken();
     const body = {
       merchantId,
       categoryId,
@@ -119,10 +110,7 @@ export default function AdminCouponsPage() {
     const method = editingId ? "PATCH" : "POST";
     fetch(apiUrl(url), {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(body),
     })

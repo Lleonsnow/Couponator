@@ -13,9 +13,7 @@ export default function MerchantLayout({
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    const opts: RequestInit = token ? { headers: { Authorization: `Bearer ${token}` } } : { credentials: "include" };
-    fetch(apiUrl("/api/auth/me"), opts)
+    fetch(apiUrl("/api/auth/me"), { credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((user: { role?: string }) => {
         if (user.role !== "MERCHANT") router.replace("/");

@@ -18,8 +18,7 @@ export default function MerchantCouponsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = document.cookie.match(/token=([^;]+)/)?.[1]?.trim();
-    fetch(apiUrl("/api/merchant/coupons"), { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+    fetch(apiUrl("/api/merchant/coupons"), { credentials: "include" })
       .then((r) => r.json())
       .then(setList)
       .catch(() => setList([]))
