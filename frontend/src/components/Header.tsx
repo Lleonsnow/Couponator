@@ -90,7 +90,7 @@ export function Header() {
         Промокоды
       </Link>
       <Link href="/me/coupons" className="text-[var(--muted)] hover:text-[var(--text)] py-2 md:py-0">
-        Мои купоны
+        Мои покупки
       </Link>
     </>
   );
