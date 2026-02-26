@@ -9,7 +9,8 @@ type Tx = {
   status: string;
   createdAt: string;
   user: { email: string };
-  coupon: { title: string };
+  coupon: { title: string } | null;
+  certificate: { title: string } | null;
 };
 
 export default function MerchantTransactionsPage() {
@@ -47,7 +48,7 @@ export default function MerchantTransactionsPage() {
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-500">{t.id.slice(0, 8)}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm whitespace-nowrap">{new Date(t.createdAt).toLocaleString("ru")}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hidden md:table-cell truncate max-w-[120px]">{t.user.email}</td>
-                <td className="max-w-[100px] sm:max-w-[200px] truncate px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm" title={t.coupon.title}>{t.coupon.title}</td>
+                <td className="max-w-[100px] sm:max-w-[200px] truncate px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm" title={t.coupon?.title ?? t.certificate?.title ?? ""}>{t.coupon?.title ?? t.certificate?.title ?? "—"}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{t.amount} ₽</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
