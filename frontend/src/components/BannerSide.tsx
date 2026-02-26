@@ -1,16 +1,35 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import DOMPurify from "dompurify";
+import { apiUrl } from "@/lib/api";
+
+type Banner = { id: string; html: string };
+
 export function BannerSide() {
+  const [banner, setBanner] = useState<Banner | null>(null);
+
+  useEffect(() => {
+    fetch(apiUrl("/api/banners?slot=SIDE"))
+      .then((r) => r.json())
+      .then((data: Banner[]) => {
+        const arr = Array.isArray(data) ? data : [];
+        if (arr.length === 0) return null;
+        if (arr.length === 1) return arr[0];
+        return arr[Math.floor(Math.random() * arr.length)];
+      })
+      .then(setBanner)
+      .catch(() => setBanner(null));
+  }, []);
+
+  if (!banner || !banner.html.trim()) return null;
+
+  const sanitized = DOMPurify.sanitize(banner.html, {
+    ALLOWED_TAGS: ["a", "img"],
+    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "width", "height", "border"],
+  });
+
   return (
-    <a
-      target="_blank"
-      rel="nofollow"
-      href="https://rzekl.com/g/qeyp40glmi98f8b05a7bb62ed2b196/?i=4&erid=5jtCeReNwxHpfQTFuq3nnpN"
-      className="block w-full rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm"
-    >
-      <img
-        src="https://aflink.ru/b/qeyp40glmi98f8b05a7bb62ed2b196/"
-        alt="Яндекс.Маркет"
-        className="w-full h-auto object-contain"
-      />
-    </a>
+    <div className="flex w-full justify-center rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm [&_a]:block [&_img]:block" dangerouslySetInnerHTML={{ __html: sanitized }} />
   );
 }
