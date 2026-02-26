@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Building2, Ticket, CreditCard } from "lucide-react";
+import { LayoutDashboard, Building2, Ticket, CreditCard, Image } from "lucide-react";
 import { Header } from "@/components/Header";
 import { apiUrl } from "@/lib/api";
 
@@ -11,6 +11,7 @@ const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "/admin": LayoutDashboard,
   "/admin/merchants": Building2,
   "/admin/coupons": Ticket,
+  "/admin/banners": Image,
   "/admin/transactions": CreditCard,
 };
 
@@ -50,6 +51,7 @@ export default function AdminLayout({
     { href: "/admin", label: "Дашборд" },
     { href: "/admin/merchants", label: "Мерчанты" },
     { href: "/admin/coupons", label: "Все купоны" },
+    { href: "/admin/banners", label: "Банеры" },
     { href: "/admin/transactions", label: "Транзакции" },
   ];
 
