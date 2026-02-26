@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import DOMPurify from "dompurify";
+import { MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
 import { apiUrl } from "@/lib/api";
 
@@ -18,7 +19,7 @@ type Coupon = {
   descriptionHtml: string;
   addressHtml: string;
   category: { name: string; slug: string };
-  merchant: { name: string };
+  merchant: { id: string; name: string };
 };
 
 type TabId = "cond" | "desc" | "gar" | "addr" | "rev";
@@ -30,8 +31,11 @@ export default function CouponPage() {
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [similar, setSimilar] = useState<Coupon[]>([]);
   const [tab, setTab] = useState<TabId>("cond");
-  const [amount, setAmount] = useState("");
-  const [amountError, setAmountError] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [modalCertOpen, setModalCertOpen] = useState(false);
+  const [certAmount, setCertAmount] = useState(100);
+  const [certificateId, setCertificateId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -65,16 +69,7 @@ export default function CouponPage() {
   }
 
   const geoLabel = coupon.noGeo ? "Все города" : coupon.city ?? "—";
-
-  function goToCheckout() {
-    setAmountError("");
-    const num = parseInt(amount, 10);
-    if (!amount || isNaN(num) || num < coupon!.price) {
-      setAmountError(`Минимальная сумма: ${coupon!.price} ₽`);
-      return;
-    }
-    router.push(`/checkout/${coupon!.id}?amount=${num}`);
-  }
+  const total = coupon.price * quantity;
 
   const tabs: { id: TabId; label: string }[] = [
     { id: "cond", label: "Условия" },
@@ -103,32 +98,110 @@ export default function CouponPage() {
                   <p className="text-sm text-slate-500">Партнер</p>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  const r = await fetch(apiUrl(`/api/merchants/${coupon.merchant.id}/certificate`));
+                  if (!r.ok) return;
+                  const cert = await r.json();
+                  setCertificateId(cert.id);
+                  setCertAmount(100);
+                  setModalCertOpen(true);
+                }}
+                className="mt-3 text-sm text-slate-500 underline decoration-slate-300 hover:text-slate-700 hover:decoration-slate-500"
+              >
+                Купить подарочный сертификат у данного продавца
+              </button>
             </div>
             <div>
               <div className="mb-4 flex items-center justify-between gap-2">
                 <span className="text-xs font-bold uppercase tracking-wide text-primary">{coupon.category.name}</span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">📍 {geoLabel}</span>
+                <span className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  {geoLabel}
+                </span>
               </div>
               <h1 className="mb-4 sm:mb-6 text-xl font-extrabold leading-tight sm:text-2xl lg:text-3xl">{coupon.title}</h1>
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
-                <label className="mb-2 block text-sm sm:text-base font-semibold text-slate-900">Введите сумму номинала купона (₽):</label>
-                <input
-                  type="number"
-                  min={coupon.price}
-                  placeholder={`Мин. ${coupon.price}`}
-                  value={amount}
-                  onChange={(e) => { setAmount(e.target.value); setAmountError(""); }}
-                  className="mb-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-base sm:text-lg font-semibold outline-none focus:border-primary min-h-[48px]"
-                />
-                {amountError && <p className="mb-2 text-sm font-medium text-red-600">{amountError}</p>}
+                <p className="mb-3 text-right text-2xl font-extrabold text-primary">{coupon.price.toLocaleString("ru-RU")} ₽</p>
                 <button
                   type="button"
-                  onClick={goToCheckout}
+                  onClick={() => { setQuantity(1); setModalOpen(true); }}
                   className="w-full rounded-xl bg-primary py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition hover:bg-primary/90 min-h-[48px]"
                 >
-                  Оформить покупку
+                  Купить
                 </button>
               </div>
+
+              {modalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setModalOpen(false)}>
+                  <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">Количество купонов</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                      className="mb-4 w-full rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold outline-none focus:border-primary"
+                    />
+                    <p className="mb-4 text-slate-600">
+                      Сумма: <strong className="text-primary">{total.toLocaleString("ru-RU")} ₽</strong>
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setModalOpen(false)}
+                        className="flex-1 rounded-xl border-2 border-slate-200 py-3 font-semibold text-slate-600 hover:bg-slate-50"
+                      >
+                        Отмена
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/checkout/${coupon.id}?amount=${total}`)}
+                        className="flex-1 rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary/90"
+                      >
+                        Купить
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {modalCertOpen && certificateId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setModalCertOpen(false)}>
+                  <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    <h3 className="mb-4 text-lg font-bold text-slate-900">Подарочный сертификат</h3>
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">Сумма (₽)</label>
+                    <input
+                      type="number"
+                      min={100}
+                      max={100000}
+                      value={certAmount}
+                      onChange={(e) => setCertAmount(Math.min(100000, Math.max(100, parseInt(e.target.value, 10) || 100)))}
+                      className="mb-4 w-full rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold outline-none focus:border-primary"
+                    />
+                    <p className="mb-4 text-slate-600">
+                      К оплате: <strong className="text-primary">{certAmount.toLocaleString("ru-RU")} ₽</strong>
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setModalCertOpen(false)}
+                        className="flex-1 rounded-xl border-2 border-slate-200 py-3 font-semibold text-slate-600 hover:bg-slate-50"
+                      >
+                        Отмена
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/checkout/${certificateId}?amount=${certAmount}&type=certificate`)}
+                        className="flex-1 rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary/90"
+                      >
+                        Купить подарочный сертификат
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
