@@ -92,7 +92,7 @@ export default function CouponPage() {
           <div className="grid gap-6 sm:gap-8 p-4 sm:p-6 lg:p-10 lg:grid-cols-[1.2fr_1fr]">
             <div>
               <img
-                src={coupon.imageUrl ?? "https://picsum.photos/seed/0/600/338"}
+                src={coupon.imageUrl ?? "/seed/coupon-bow.jpg"}
                 alt=""
                 className="aspect-video w-full rounded-xl object-cover shadow-sm"
               />
@@ -170,7 +170,7 @@ export default function CouponPage() {
                   className="flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:shadow-md"
                 >
                   <img
-                    src={c.imageUrl ?? "https://picsum.photos/seed/0/600/338"}
+                    src={c.imageUrl ?? "/seed/coupon-bow.jpg"}
                     alt=""
                     className="aspect-video w-full object-cover"
                   />

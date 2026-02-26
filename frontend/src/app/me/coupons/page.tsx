@@ -63,7 +63,7 @@ export default function MyCouponsPage() {
                 className="flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:shadow-md"
               >
                 <img
-                  src={tx.coupon.imageUrl ?? "https://picsum.photos/seed/0/600/338"}
+                  src={tx.coupon.imageUrl ?? "/seed/coupon-bow.jpg"}
                   alt=""
                   className="aspect-video w-full object-cover"
                 />

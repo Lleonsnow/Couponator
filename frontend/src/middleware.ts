@@ -3,14 +3,6 @@ import type { NextRequest } from "next/server";
 
 const protectedPaths = ["/me", "/admin", "/merchant"];
 
-const securityHeaders = new Headers([
-  ["X-Frame-Options", "DENY"],
-  ["X-Content-Type-Options", "nosniff"],
-  ["Referrer-Policy", "strict-origin-when-cross-origin"],
-  ["Permissions-Policy", "camera=(), microphone=(), geolocation=()"],
-]);
-if (process.env.NODE_ENV === "production")
-  securityHeaders.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -22,7 +14,7 @@ const csp = [
   "base-uri 'self'",
   "form-action 'self'",
 ];
-securityHeaders.set("Content-Security-Policy", csp.join("; "));
+const securityHeaders = new Headers([["Content-Security-Policy", csp.join("; ")]]);
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;

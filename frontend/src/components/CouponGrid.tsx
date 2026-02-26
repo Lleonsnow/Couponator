@@ -61,7 +61,7 @@ export function CouponGrid({
           category={c.category.name}
           city={c.noGeo ? "Все города" : c.city ?? "—"}
           price={c.price}
-          imageUrl={c.imageUrl ?? "https://picsum.photos/seed/0/600/338"}
+          imageUrl={c.imageUrl ?? "/seed/coupon-bow.jpg"}
         />
       ))}
     </div>
