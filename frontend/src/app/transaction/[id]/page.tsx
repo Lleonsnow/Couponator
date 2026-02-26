@@ -19,7 +19,12 @@ type Tx = {
     price: number;
     merchant: { name: string };
     category: { name: string };
-  };
+  } | null;
+  certificate: {
+    id: string;
+    title: string;
+    merchant: { name: string };
+  } | null;
 };
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
@@ -96,8 +101,8 @@ export default function TransactionDetailsPage() {
           <div className="space-y-0">
             <Row label="Дата и время" value={dateStr} />
             <Row label="Покупатель" value={tx.user.email} />
-            <Row label="Компания" value={tx.coupon.merchant.name} />
-            <Row label="Название купона" value={tx.coupon.title} />
+            <Row label="Компания" value={tx.coupon?.merchant.name ?? tx.certificate?.merchant.name ?? "—"} />
+            <Row label={tx.certificate ? "Сертификат" : "Название купона"} value={tx.coupon?.title ?? tx.certificate?.title ?? "—"} />
             <Row
               label="Статус оплаты"
               value={
