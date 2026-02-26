@@ -19,7 +19,16 @@ export function SidebarPromos() {
   useEffect(() => {
     fetch(apiUrl("/api/promocodes"))
       .then((r) => r.json())
-      .then((data) => setList(Array.isArray(data) ? data.slice(0, 3) : []))
+      .then((data) => {
+        const arr = Array.isArray(data) ? [...data] : [];
+        if (arr.length <= 3) return arr.slice(0, 3);
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr.slice(0, 3);
+      })
+      .then(setList)
       .catch(() => setList([]));
   }, []);
 

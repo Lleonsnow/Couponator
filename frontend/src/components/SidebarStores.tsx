@@ -24,11 +24,16 @@ export function SidebarStores() {
           if (!seen.has(p.store)) {
             seen.add(p.store);
             uniq.push(p);
-            if (uniq.length >= 3) break;
           }
         }
-        setList(uniq);
+        if (uniq.length <= 3) return uniq;
+        for (let i = uniq.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [uniq[i], uniq[j]] = [uniq[j], uniq[i]];
+        }
+        return uniq.slice(0, 3);
       })
+      .then(setList)
       .catch(() => setList([]));
   }, []);
 
