@@ -105,3 +105,15 @@ model PromoCode {
   logo     String
   link     String
 }
+
+enum BannerSlot {
+  TOP
+  SIDE
+}
+
+model Banner {
+  id   String     @id @default(cuid())
+  slot BannerSlot
+  html String     @default("")
+  order Int       @default(0)
+}
