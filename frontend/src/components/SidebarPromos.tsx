@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { apiUrl } from "@/lib/api";
 
 type Promo = {
@@ -55,9 +56,10 @@ export function SidebarPromos() {
           ))}
           <Link
             href="/promocodes"
-            className="mt-4 block rounded-lg bg-primary/10 py-2.5 text-center text-sm font-semibold text-primary transition hover:bg-primary/20"
+            className="mt-4 flex items-center justify-center gap-1 rounded-lg bg-primary/10 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/20"
           >
-            Все промокоды →
+            Все промокоды
+            <ChevronRight className="h-4 w-4 shrink-0" />
           </Link>
         </>
       )}

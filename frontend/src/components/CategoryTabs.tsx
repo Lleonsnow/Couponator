@@ -1,24 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Gamepad2,
+  BedDouble,
+  Sparkles,
+  Car,
+  UtensilsCrossed,
+  Heart,
+  GraduationCap,
+  Dumbbell,
+  ShoppingCart,
+  Baby,
+  Map,
+  Ticket,
+  Camera,
+  Package,
+  LayoutGrid,
+  type LucideIcon,
+} from "lucide-react";
 import { apiUrl } from "@/lib/api";
 
-const SLUG_ICON: Record<string, string> = {
-  entertainment: "🎳",
-  hotels: "🏨",
-  beauty: "💇‍♀️",
-  auto: "🚗",
-  food: "🍔",
-  health: "🏥",
-  education: "📚",
-  sport: "🏋️",
-  shops: "🛒",
-  kids: "🧸",
-  tours: "🗺️",
-  events: "🎫",
-  photo: "📸",
-  cleaning: "🧹",
-  delivery: "📦",
+const SLUG_ICON: Record<string, LucideIcon> = {
+  entertainment: Gamepad2,
+  hotels: BedDouble,
+  beauty: Sparkles,
+  auto: Car,
+  food: UtensilsCrossed,
+  health: Heart,
+  education: GraduationCap,
+  sport: Dumbbell,
+  shops: ShoppingCart,
+  kids: Baby,
+  tours: Map,
+  events: Ticket,
+  photo: Camera,
+  cleaning: Sparkles,
+  delivery: Package,
 };
 
 type Category = { id: string; slug: string; name: string };
@@ -78,11 +96,14 @@ export function CategoryTabs({
             }`}
           >
             <span
-              className={`flex h-14 w-14 sm:h-[68px] sm:w-[68px] items-center justify-center rounded-xl bg-white text-2xl sm:text-3xl shadow-sm transition hover:bg-primary/10 ${
+              className={`flex h-14 w-14 sm:h-[68px] sm:w-[68px] items-center justify-center rounded-xl bg-white shadow-sm transition hover:bg-primary/10 ${
                 active ? "bg-primary/10 ring-2 ring-primary" : ""
               }`}
             >
-              {SLUG_ICON[c.slug] ?? "📋"}
+              {(() => {
+                const Icon = SLUG_ICON[c.slug] ?? LayoutGrid;
+                return <Icon className="h-7 w-7 sm:h-8 sm:w-8" />;
+              })()}
             </span>
             <span className="text-center text-xs sm:text-sm font-semibold">{c.name}</span>
           </button>
