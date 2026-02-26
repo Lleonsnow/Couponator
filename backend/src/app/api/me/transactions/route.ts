@@ -22,6 +22,13 @@ export async function GET(req: Request) {
           category: { select: { name: true } },
         },
       },
+      certificate: {
+        select: {
+          id: true,
+          title: true,
+          merchant: { select: { name: true } },
+        },
+      },
     },
   });
   return NextResponse.json(list);

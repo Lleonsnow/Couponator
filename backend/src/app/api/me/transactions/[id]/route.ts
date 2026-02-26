@@ -25,6 +25,13 @@ export async function GET(
           category: { select: { name: true } },
         },
       },
+      certificate: {
+        select: {
+          id: true,
+          title: true,
+          merchant: { select: { name: true } },
+        },
+      },
       user: { select: { email: true } },
     },
   });
