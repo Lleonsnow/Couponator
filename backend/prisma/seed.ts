@@ -171,14 +171,18 @@ async function main() {
   await prisma.transaction.deleteMany({});
   await prisma.coupon.deleteMany({});
 
+  const DEFAULT_DISCOUNT = 10;
   log("купоны (1/45)...");
+  const price1 = 975;
   await prisma.coupon.create({
     data: {
       merchantId: merchants[0].id,
       title: "Купон на стрельбу из лука, арбалета и пневматики",
       categoryId: entCat.id,
       imageUrl: "/seed/coupon-bow.jpg",
-      price: 975,
+      price: price1,
+      oldPrice: Math.round(price1 / (1 - DEFAULT_DISCOUNT / 100)),
+      discountPercent: DEFAULT_DISCOUNT,
       city: "Москва",
       noGeo: false,
       conditionsHtml:
@@ -196,13 +200,16 @@ async function main() {
     const cityIdx = Math.floor(Math.random() * 5);
     const noGeo = Math.random() > 0.8;
     const city = noGeo ? null : CITIES[cityIdx];
+    const price = Math.floor(Math.random() * 300) * 10 + 500;
     const c = await prisma.coupon.create({
       data: {
         merchantId: merchant.id,
         title: `Скидка на услуги: ${cat.name} (Купон #${i})`,
         categoryId: cat.id,
         imageUrl: `/seed/coupon-${i * 12}.jpg`,
-        price: Math.floor(Math.random() * 300) * 10 + 500,
+        price,
+        oldPrice: Math.round(price / (1 - DEFAULT_DISCOUNT / 100)),
+        discountPercent: DEFAULT_DISCOUNT,
         city,
         noGeo,
         conditionsHtml: "<p>Стандартные условия предоставления услуги.</p>",
