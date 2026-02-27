@@ -38,13 +38,14 @@ model Category {
 }
 
 model Merchant {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   name         String
-  slug         String   @unique
-  ownerUserId  String   @unique
-  owner        User     @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
+  slug         String        @unique
+  ownerUserId  String        @unique
+  owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
   coupons      Coupon[]
+  certificates Certificate[]
 }
 
 model Coupon {
@@ -56,6 +57,8 @@ model Coupon {
   category        Category  @relation(fields: [categoryId], references: [id])
   imageUrl        String?
   price           Int
+  oldPrice        Int?
+  discountPercent Int?
   city            String?
   noGeo           Boolean   @default(false)
   conditionsHtml  String    @default("")
@@ -67,12 +70,25 @@ model Coupon {
   transactions    Transaction[]
 }
 
+model Certificate {
+  id           String        @id @default(cuid())
+  merchantId   String
+  merchant     Merchant      @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  title        String        @default("Подарочный сертификат")
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+}
+
 model Transaction {
   id                String            @id @default(cuid())
   userId            String
   user              User              @relation(fields: [userId], references: [id])
-  couponId          String
-  coupon            Coupon            @relation(fields: [couponId], references: [id])
+  couponId          String?
+  coupon            Coupon?           @relation(fields: [couponId], references: [id])
+  certificateId     String?
+  certificate       Certificate?      @relation(fields: [certificateId], references: [id])
   status            TransactionStatus @default(PENDING)
   amount            Int
   currency          String            @default("RUB")
@@ -90,4 +106,16 @@ model PromoCode {
   desc     String
   logo     String
   link     String
+}
+
+enum BannerSlot {
+  TOP
+  SIDE
+}
+
+model Banner {
+  id   String     @id @default(cuid())
+  slot BannerSlot
+  html String     @default("")
+  order Int       @default(0)
 }

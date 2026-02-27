@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Pencil } from "lucide-react";
 import { apiUrl } from "@/lib/api";
 
 type Coupon = {
@@ -38,6 +40,7 @@ export default function MerchantCouponsPage() {
               <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Название</th>
               <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Мин. цена</th>
               <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500 hidden sm:table-cell">ГЕО</th>
+              <th className="border-b border-slate-200 px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -49,6 +52,12 @@ export default function MerchantCouponsPage() {
                 <td className="max-w-[140px] sm:max-w-[240px] truncate px-2 py-2 sm:px-4 sm:py-3 text-sm font-medium" title={c.title}>{c.title}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{c.price} ₽</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{c.noGeo ? "Все города" : c.city ?? "—"}</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3">
+                  <Link href={`/merchant/coupons/${c.id}/edit`} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                    <Pencil className="h-4 w-4" />
+                    Редактировать
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

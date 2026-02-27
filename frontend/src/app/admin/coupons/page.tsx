@@ -8,6 +8,8 @@ type Coupon = {
   id: string;
   title: string;
   price: number;
+  oldPrice?: number | null;
+  discountPercent?: number | null;
   city: string | null;
   noGeo: boolean;
   imageUrl: string | null;
@@ -36,6 +38,8 @@ export default function AdminCouponsPage() {
   const [categoryId, setCategoryId] = useState("");
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
+  const [oldPrice, setOldPrice] = useState("");
+  const [discountPercent, setDiscountPercent] = useState("");
   const [noGeo, setNoGeo] = useState(false);
   const [city, setCity] = useState("Москва");
   const [conditionsHtml, setConditionsHtml] = useState(defaultHtml);
@@ -74,7 +78,11 @@ export default function AdminCouponsPage() {
     setMerchantId(c.merchantId ?? c.merchant.id);
     setCategoryId(c.categoryId ?? c.category.id);
     setTitle(c.title);
-    setPrice(String(c.price));
+    const p = c.price;
+    setPrice(String(p));
+    const hasDiscount = c.oldPrice != null && c.discountPercent != null;
+    setOldPrice(hasDiscount ? String(c.oldPrice) : String(p));
+    setDiscountPercent(hasDiscount ? String(c.discountPercent) : "0");
     setNoGeo(c.noGeo);
     setCity(c.city ?? "Москва");
     setConditionsHtml(c.conditionsHtml ?? defaultHtml);
@@ -85,20 +93,65 @@ export default function AdminCouponsPage() {
     setShowForm(true);
   }
 
+  const priceNum = parseInt(price, 10) || 0;
+  const oldNum = parseInt(oldPrice, 10);
+  const discountNum = parseInt(discountPercent, 10);
+  const useDiscount = oldPrice.trim() !== "" && discountPercent.trim() !== "";
+  const computedPrice = useDiscount && !isNaN(oldNum) && !isNaN(discountNum) && discountNum <= 99
+    ? Math.round(oldNum * (1 - discountNum / 100))
+    : null;
+
+  function handleOldPriceChange(val: string) {
+    setOldPrice(val);
+    const o = parseInt(val, 10);
+    if (!isNaN(o) && o > 0 && priceNum > 0) {
+      if (o < priceNum) {
+        setOldPrice(String(priceNum));
+        setDiscountPercent("0");
+      } else {
+        const d = Math.round((1 - priceNum / o) * 100);
+        setDiscountPercent(String(Math.min(99, Math.max(0, d))));
+      }
+    }
+  }
+
+  function handleDiscountChange(val: string) {
+    setDiscountPercent(val);
+    const d = Math.min(99, Math.max(0, parseInt(val, 10) || 0));
+    if (d < 100 && priceNum > 0) {
+      const o = d >= 100 ? priceNum : Math.round(priceNum / (1 - d / 100));
+      setOldPrice(String(Math.max(o, priceNum)));
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitError("");
-    const priceNum = parseInt(price, 10);
-    if (!title.trim() || isNaN(priceNum) || priceNum < 0 || !merchantId || !categoryId) {
-      setSubmitError("Заполните название, цену, мерчанта и категорию");
+    if (!title.trim() || !merchantId || !categoryId) {
+      setSubmitError("Заполните название, мерчанта и категорию");
       return;
     }
+    if (useDiscount) {
+      if (computedPrice == null || computedPrice < 0) {
+        setSubmitError("Укажите старую цену и скидку 0–99%");
+        return;
+      }
+      if (oldNum < priceNum) {
+        setSubmitError("Старая цена не может быть меньше актуальной");
+        return;
+      }
+    } else {
+      const priceNum = parseInt(price, 10);
+      if (isNaN(priceNum) || priceNum < 0) {
+        setSubmitError("Заполните цену или старую цену и скидку");
+        return;
+      }
+    }
     setSubmitting(true);
-    const body = {
+    const body: Record<string, unknown> = {
       merchantId,
       categoryId,
       title: title.trim(),
-      price: priceNum,
       noGeo,
       city: noGeo ? null : city,
       conditionsHtml: conditionsHtml || defaultHtml,
@@ -106,6 +159,12 @@ export default function AdminCouponsPage() {
       addressHtml: addressHtml || defaultHtml,
       imageUrl: imageUrl.trim() || null,
     };
+    if (oldPrice.trim() !== "" && discountPercent.trim() !== "") {
+      body.oldPrice = parseInt(oldPrice, 10);
+      body.discountPercent = parseInt(discountPercent, 10);
+    } else {
+      body.price = parseInt(price, 10);
+    }
     const url = editingId ? `/api/coupons/${editingId}` : "/api/coupons";
     const method = editingId ? "PATCH" : "POST";
     fetch(apiUrl(url), {
@@ -122,6 +181,8 @@ export default function AdminCouponsPage() {
         setEditingId(null);
         setTitle("");
         setPrice("");
+        setOldPrice("");
+        setDiscountPercent("");
         setNoGeo(false);
         setCity("Москва");
         setConditionsHtml(defaultHtml);
@@ -181,18 +242,65 @@ export default function AdminCouponsPage() {
                 required
               />
             </div>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
-              <div className="min-w-0 flex-1">
-                <label className="block text-sm font-semibold text-slate-500">Базовая цена (₽)</label>
-                <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  min={0}
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 font-bold text-primary min-h-[48px]"
-                  required
-                />
+            <div className="flex flex-col gap-3 sm:gap-5">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
+                <div className="min-w-0 flex-1">
+                  <label className="block text-sm font-semibold text-slate-500">Старая цена (₽)</label>
+                  <input
+                    type="number"
+                    value={oldPrice}
+                    onChange={(e) => handleOldPriceChange(e.target.value)}
+                    min={priceNum}
+                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 min-h-[48px]"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <label className="block text-sm font-semibold text-slate-500">Скидка (%)</label>
+                  <input
+                    type="number"
+                    value={discountPercent}
+                    onChange={(e) => handleDiscountChange(e.target.value)}
+                    min={0}
+                    max={99}
+                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 min-h-[48px]"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <label className="block text-sm font-semibold text-slate-500">Цена (актуальная, ₽)</label>
+                  <input
+                    type="number"
+                    value={price}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setPrice(val);
+                      const p = parseInt(val, 10);
+                      if (!isNaN(p) && p >= 0) {
+                        if (oldPrice.trim() === "") {
+                          setOldPrice(val);
+                          setDiscountPercent("0");
+                        } else {
+                          const o = parseInt(oldPrice, 10);
+                          if (o >= p) {
+                            const d = Math.round((1 - p / o) * 100);
+                            setDiscountPercent(String(Math.min(99, Math.max(0, d))));
+                          } else {
+                            setOldPrice(val);
+                            setDiscountPercent("0");
+                          }
+                        }
+                      }
+                    }}
+                    min={0}
+                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 font-bold text-primary min-h-[48px] bg-slate-50"
+                    required
+                  />
+                </div>
               </div>
+              {useDiscount && computedPrice != null && (
+                <p className="text-sm text-slate-500">Итог к оплате: {computedPrice} ₽</p>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
               <div className="min-w-0 flex-1">
                 <label className="block text-sm font-semibold text-slate-500">Категория</label>
                 <select
@@ -233,12 +341,12 @@ export default function AdminCouponsPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-500">URL изображения</label>
+              <label className="block text-sm font-semibold text-slate-500">URL или путь к изображению</label>
               <input
-                type="url"
+                type="text"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
+                placeholder="https://... или /seed/photo.jpg"
                 className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 min-h-[48px]"
               />
             </div>

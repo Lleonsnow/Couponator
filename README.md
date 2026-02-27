@@ -15,6 +15,8 @@ JWT_SECRET=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F2G3H4I
 
 ALLOWED_ORIGINS=http://localhost,http://localhost:3000,https://localhost,https://localhost:3000
 
+ADMITAD_FEED_URL=https://export.admitad.com/ru/webmaster/websites/.../export/?code=...&user=...&region=00&format=xml&v=1
+
 RATE_LIMIT_LOGIN_MAX=10
 RATE_LIMIT_LOGIN_WINDOW_MS=60000
 
@@ -37,6 +39,12 @@ docker compose up -d --build
 
 ```bash
 docker compose exec backend pnpm run db:seed
+```
+
+5. Синхронизация промокодов из фида Admitad (загрузка по `ADMITAD_FEED_URL` из .env):
+
+```bash
+docker compose exec backend npx tsx scripts/sync-admitad-coupons.ts
 ```
 
 Остановка: `docker compose down`

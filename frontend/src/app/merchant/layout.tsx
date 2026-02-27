@@ -3,7 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { LayoutDashboard, Ticket, UserCircle, ShoppingBag } from "lucide-react";
 import { apiUrl } from "@/lib/api";
+
+const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  "/merchant": LayoutDashboard,
+  "/merchant/coupons": Ticket,
+  "/merchant/profile": UserCircle,
+  "/merchant/transactions": ShoppingBag,
+};
 
 export default function MerchantLayout({
   children,
@@ -46,19 +54,23 @@ export default function MerchantLayout({
       <div className="mx-auto flex flex-col lg:flex-row max-w-6xl gap-4 lg:gap-8 p-4 sm:p-6">
         <aside className="lg:w-64 shrink-0 overflow-x-auto">
           <nav className="flex gap-2 lg:flex-col lg:gap-1 rounded-xl lg:rounded-2xl border border-slate-100 bg-white p-3 lg:p-5 shadow-sm lg:min-w-[16rem]">
-            {nav.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`rounded-lg px-3 py-2.5 lg:px-4 lg:py-3 text-left font-semibold text-sm lg:text-base transition shrink-0 lg:shrink ${
-                  (href === "/merchant" ? pathname === "/merchant" : pathname.startsWith(href))
-                    ? "bg-primary/10 text-primary"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
+            {nav.map(({ href, label }) => {
+              const Icon = NAV_ICONS[href];
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-2 lg:gap-3 rounded-lg px-3 py-2.5 lg:px-4 lg:py-3 text-left font-semibold text-sm lg:text-base transition shrink-0 lg:shrink ${
+                    (href === "/merchant" ? pathname === "/merchant" : pathname.startsWith(href))
+                      ? "bg-primary/10 text-primary"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  }`}
+                >
+                  {Icon && <Icon className="h-5 w-5 shrink-0" />}
+                  {label}
+                </Link>
+              );
+            })}
           </nav>
         </aside>
         <main className="min-w-0 flex-1 rounded-xl sm:rounded-2xl border border-slate-100 bg-white p-4 sm:p-6 shadow-sm overflow-x-auto">

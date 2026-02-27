@@ -10,13 +10,15 @@ const postSchema = z.object({
   merchantId: z.string().cuid().optional(),
   categoryId: z.string().cuid(),
   title: z.string().min(1).max(500),
-  price: z.number().int().min(0),
+  price: z.number().int().min(0).optional(),
+  oldPrice: z.number().int().min(0).nullable().optional(),
+  discountPercent: z.number().int().min(0).max(99).nullable().optional(),
   noGeo: z.boolean(),
   city: z.string().max(100).nullable().optional(),
   conditionsHtml: z.string().optional(),
   descriptionHtml: z.string().optional(),
   addressHtml: z.string().optional(),
-  imageUrl: z.string().url().nullable().optional(),
+  imageUrl: z.string().max(2000).nullable().optional(),
 });
 
 export async function GET() {
@@ -58,12 +60,25 @@ export async function POST(req: Request) {
   if (!category)
     return NextResponse.json({ error: "Category not found" }, { status: 400 });
 
+  let price: number;
+  if (parsed.data.oldPrice != null && parsed.data.discountPercent != null) {
+    price = Math.round(parsed.data.oldPrice * (1 - parsed.data.discountPercent / 100));
+  } else if (parsed.data.price != null) {
+    price = parsed.data.price;
+  } else {
+    return NextResponse.json({ error: "Укажите цену или oldPrice и скидку %" }, { status: 400 });
+  }
+  if (price < 0)
+    return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+
   const coupon = await prisma.coupon.create({
     data: {
       merchantId,
       categoryId: parsed.data.categoryId,
       title: parsed.data.title,
-      price: parsed.data.price,
+      price,
+      oldPrice: parsed.data.oldPrice ?? null,
+      discountPercent: parsed.data.discountPercent ?? null,
       noGeo: parsed.data.noGeo,
       city: parsed.data.noGeo ? null : (parsed.data.city ?? null),
       conditionsHtml: parsed.data.conditionsHtml ?? "",

@@ -10,6 +10,7 @@ type Tx = {
   createdAt: string;
   user: { email: string } | null;
   coupon: { title: string; merchant: { name: string } } | null;
+  certificate: { title: string; merchant: { name: string } } | null;
 };
 
 export default function AdminTransactionsPage() {
@@ -51,8 +52,8 @@ export default function AdminTransactionsPage() {
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-500">{t.id.slice(0, 8)}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm whitespace-nowrap">{new Date(t.createdAt).toLocaleString("ru")}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm truncate max-w-[120px]">{t.user?.email ?? "—"}</td>
-                <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{t.coupon?.merchant?.name ?? "—"}</td>
-                <td className="max-w-[120px] sm:max-w-[180px] truncate px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm" title={t.coupon?.title}>{t.coupon?.title ?? "—"}</td>
+                <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{t.coupon?.merchant?.name ?? t.certificate?.merchant?.name ?? "—"}</td>
+                <td className="max-w-[120px] sm:max-w-[180px] truncate px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm" title={t.coupon?.title ?? t.certificate?.title ?? ""}>{t.coupon?.title ?? t.certificate?.title ?? "—"}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{t.amount} ₽</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${

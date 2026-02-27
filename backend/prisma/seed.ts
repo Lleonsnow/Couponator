@@ -171,14 +171,18 @@ async function main() {
   await prisma.transaction.deleteMany({});
   await prisma.coupon.deleteMany({});
 
+  const DEFAULT_DISCOUNT = 10;
   log("купоны (1/45)...");
+  const price1 = 975;
   await prisma.coupon.create({
     data: {
       merchantId: merchants[0].id,
       title: "Купон на стрельбу из лука, арбалета и пневматики",
       categoryId: entCat.id,
-      imageUrl: "https://picsum.photos/seed/bow/600/338",
-      price: 975,
+      imageUrl: "/seed/coupon-bow.jpg",
+      price: price1,
+      oldPrice: Math.round(price1 / (1 - DEFAULT_DISCOUNT / 100)),
+      discountPercent: DEFAULT_DISCOUNT,
       city: "Москва",
       noGeo: false,
       conditionsHtml:
@@ -196,13 +200,16 @@ async function main() {
     const cityIdx = Math.floor(Math.random() * 5);
     const noGeo = Math.random() > 0.8;
     const city = noGeo ? null : CITIES[cityIdx];
+    const price = Math.floor(Math.random() * 300) * 10 + 500;
     const c = await prisma.coupon.create({
       data: {
         merchantId: merchant.id,
         title: `Скидка на услуги: ${cat.name} (Купон #${i})`,
         categoryId: cat.id,
-        imageUrl: `https://picsum.photos/seed/${i * 12}/600/338`,
-        price: Math.floor(Math.random() * 300) * 10 + 500,
+        imageUrl: `/seed/coupon-${i * 12}.jpg`,
+        price,
+        oldPrice: Math.round(price / (1 - DEFAULT_DISCOUNT / 100)),
+        discountPercent: DEFAULT_DISCOUNT,
         city,
         noGeo,
         conditionsHtml: "<p>Стандартные условия предоставления услуги.</p>",
@@ -235,13 +242,13 @@ async function main() {
   log("промокоды (7)...");
   await prisma.promoCode.deleteMany({});
   const PROMO_CODES = [
-    { store: "Алёнка", title: "Скидка 50% по промокоду + подарки", code: "ФЕВРАЛЬ", discount: "50%", desc: "Батончики РотФронт при заказе от 999 р.", logo: "https://cdn.admitad.com/campaign/images/2020/10/21/17345-e9f9e2c11f2b8bac.png", link: "https://dhwnh.com/g/wu9btps6pk98f8b05a7b45305aaa81/?i=3" },
-    { store: "ECCO", title: "Скидка 500 рублей на все", code: "ECCOADMITAD500", discount: "500 ₽", desc: "Не применяется к акционным товарам", logo: "https://cdn.admitad.com/campaign/images/2020/10/14/13979-0403d3332204d59a.png", link: "https://kdbov.com/g/thm6cegqfc98f8b05a7b2cb26b7aaa/?i=3" },
-    { store: "Playtoday", title: "Скидка 10% на все!", code: "TOGETHER10", discount: "10%", desc: "Скидка на детскую одежду", logo: "https://cdn.admitad.com/campaign/images/2021/4/5/17006-bf41cdea126535be.svg", link: "https://rcpsj.com/g/o816muoptj98f8b05a7b78ec4c4caa/?i=3" },
-    { store: "xcom-shop", title: "Скидка 3% на заказ", code: "Admitad_02", discount: "3%", desc: "Скидка на электронику и инструменты", logo: "https://cdn.admitad.com/campaign/images/2020/10/12/14442-61f998e4c2852cdf.png", link: "https://bywiola.com/g/5icdsgkpe798f8b05a7b67a4d63e81/?i=3" },
-    { store: "COZY HOME", title: "Скидка 30% от 5000", code: "admitad30", discount: "30%", desc: "Действует только онлайн", logo: "https://cdn.admitad.com/campaign/images/2022/7/11/26239-9ee15859e5e68126.jpg", link: "https://ficca2021.com/g/k7pgzv4jt698f8b05a7b74bec426fb/?i=3" },
-    { store: "belle you", title: "Скидка 6% при заказе от 5500р", code: "admitad6", discount: "6%", desc: "Действует онлайн для всех клиентов", logo: "https://cdn.admitad.com/campaign/images/2026/2/18/23407-9d91029d4d01340f.svg", link: "https://thevospad.com/g/jdwj1fvgbt98f8b05a7b9db36b8b43/?i=3" },
-    { store: "YVES ROCHER", title: "Скидка 25% от 4000 руб", code: "АMMA-B4L", discount: "25%", desc: "Уходовая косметика и парфюмерия", logo: "https://cdn.admitad.com/campaign/images/2023/3/13/1667-50e340ecac199ec3.svg", link: "https://cafxq.com/g/2sfsmfuy1a98f8b05a7bc188ef9305/?i=3" },
+    { store: "Алёнка", title: "Скидка 50% по промокоду + подарки", code: "ФЕВРАЛЬ", discount: "50%", desc: "Батончики РотФронт при заказе от 999 р.", logo: "/seed/promo-alenka.png", link: "https://dhwnh.com/g/wu9btps6pk98f8b05a7b45305aaa81/?i=3" },
+    { store: "ECCO", title: "Скидка 500 рублей на все", code: "ECCOADMITAD500", discount: "500 ₽", desc: "Не применяется к акционным товарам", logo: "/seed/promo-ecco.png", link: "https://kdbov.com/g/thm6cegqfc98f8b05a7b2cb26b7aaa/?i=3" },
+    { store: "Playtoday", title: "Скидка 10% на все!", code: "TOGETHER10", discount: "10%", desc: "Скидка на детскую одежду", logo: "/seed/promo-playtoday.svg", link: "https://rcpsj.com/g/o816muoptj98f8b05a7b78ec4c4caa/?i=3" },
+    { store: "xcom-shop", title: "Скидка 3% на заказ", code: "Admitad_02", discount: "3%", desc: "Скидка на электронику и инструменты", logo: "/seed/promo-xcom-shop.png", link: "https://bywiola.com/g/5icdsgkpe798f8b05a7b67a4d63e81/?i=3" },
+    { store: "COZY HOME", title: "Скидка 30% от 5000", code: "admitad30", discount: "30%", desc: "Действует только онлайн", logo: "/seed/promo-cozy-home.jpg", link: "https://ficca2021.com/g/k7pgzv4jt698f8b05a7b74bec426fb/?i=3" },
+    { store: "belle you", title: "Скидка 6% при заказе от 5500р", code: "admitad6", discount: "6%", desc: "Действует онлайн для всех клиентов", logo: "/seed/promo-belle-you.svg", link: "https://thevospad.com/g/jdwj1fvgbt98f8b05a7b9db36b8b43/?i=3" },
+    { store: "YVES ROCHER", title: "Скидка 25% от 4000 руб", code: "АMMA-B4L", discount: "25%", desc: "Уходовая косметика и парфюмерия", logo: "/seed/promo-yves-rocher.svg", link: "https://cafxq.com/g/2sfsmfuy1a98f8b05a7bc188ef9305/?i=3" },
   ];
   await prisma.promoCode.createMany({ data: PROMO_CODES });
 
