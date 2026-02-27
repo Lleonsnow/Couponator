@@ -6,10 +6,14 @@ type Props = {
   category: string;
   city: string;
   price: number;
+  oldPrice?: number;
+  discountPercent?: number;
   imageUrl: string;
 };
 
-export function CouponCard({ id, title, category, city, price, imageUrl }: Props) {
+export function CouponCard({ id, title, category, city, price, oldPrice, discountPercent, imageUrl }: Props) {
+  const hasDiscount = oldPrice != null && discountPercent != null && discountPercent > 0;
+
   return (
     <Link
       href={`/coupon/${id}`}
@@ -32,7 +36,19 @@ export function CouponCard({ id, title, category, city, price, imageUrl }: Props
         <h3 className="mb-3 sm:mb-4 line-clamp-2 flex-1 text-sm sm:text-base font-semibold leading-snug">
           {title}
         </h3>
-        <p className="mt-auto text-lg sm:text-xl font-extrabold">От {price} ₽</p>
+        {hasDiscount ? (
+          <div className="mt-auto">
+            <div className="mb-1 inline-flex items-center rounded-md bg-gradient-to-r from-red-500 to-orange-500 px-2 py-0.5 text-xs font-bold text-white">
+              −{discountPercent}%
+            </div>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-base sm:text-lg font-extrabold text-primary">{price.toLocaleString("ru-RU")} ₽</span>
+              <span className="text-sm text-slate-500 line-through" style={{ fontSize: "1.2em" }}>{oldPrice.toLocaleString("ru-RU")} ₽</span>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-auto text-lg sm:text-xl font-extrabold">От {price} ₽</p>
+        )}
       </div>
     </Link>
   );

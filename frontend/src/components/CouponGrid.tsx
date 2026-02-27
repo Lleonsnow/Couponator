@@ -9,6 +9,8 @@ type Coupon = {
   id: string;
   title: string;
   price: number;
+  oldPrice?: number | null;
+  discountPercent?: number | null;
   city: string | null;
   noGeo: boolean;
   imageUrl: string | null;
@@ -61,6 +63,8 @@ export function CouponGrid({
           category={c.category.name}
           city={c.noGeo ? "Все города" : c.city ?? "—"}
           price={c.price}
+          oldPrice={c.oldPrice ?? undefined}
+          discountPercent={c.discountPercent ?? undefined}
           imageUrl={c.imageUrl ?? "/seed/coupon-bow.jpg"}
         />
       ))}
