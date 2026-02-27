@@ -57,6 +57,8 @@ model Coupon {
   category        Category  @relation(fields: [categoryId], references: [id])
   imageUrl        String?
   price           Int
+  oldPrice        Int?
+  discountPercent Int?
   city            String?
   noGeo           Boolean   @default(false)
   conditionsHtml  String    @default("")
