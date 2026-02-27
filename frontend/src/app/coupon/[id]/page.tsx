@@ -37,6 +37,7 @@ export default function CouponPage() {
   const [quantity, setQuantity] = useState(1);
   const [modalCertOpen, setModalCertOpen] = useState(false);
   const [certAmount, setCertAmount] = useState(100);
+  const [certAmountError, setCertAmountError] = useState("");
   const [certificateId, setCertificateId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -139,9 +140,10 @@ export default function CouponPage() {
                     const r = await fetch(apiUrl(`/api/merchants/${coupon.merchant.id}/certificate`));
                     if (!r.ok) return;
                     const cert = await r.json();
-                    setCertificateId(cert.id);
-                    setCertAmount(100);
-                    setModalCertOpen(true);
+                setCertificateId(cert.id);
+                  setCertAmount(100);
+                  setCertAmountError("");
+                  setModalCertOpen(true);
                   }}
                   className="mt-3 w-full rounded-xl bg-orange-500 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition hover:bg-orange-600 min-h-[48px]"
                 >
@@ -190,12 +192,17 @@ export default function CouponPage() {
                     <label className="mb-2 block text-sm font-semibold text-slate-700">Сумма (₽)</label>
                     <input
                       type="number"
-                      min={100}
                       max={100000}
                       value={certAmount}
-                      onChange={(e) => setCertAmount(Math.min(100000, Math.max(100, parseInt(e.target.value, 10) || 100)))}
-                      className="mb-4 w-full rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold outline-none focus:border-primary"
+                      onChange={(e) => {
+                        setCertAmountError("");
+                        setCertAmount(Math.min(100000, parseInt(e.target.value, 10) || 0));
+                      }}
+                      placeholder="100 – 100 000"
+                      className="mb-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-base font-semibold outline-none focus:border-primary"
                     />
+                    <p className="mb-4 text-sm text-slate-500">Допустимый диапазон: 100 – 100 000 ₽</p>
+                    {certAmountError && <p className="mb-4 text-sm text-red-600">{certAmountError}</p>}
                     <p className="mb-4 text-slate-600">
                       К оплате: <strong className="text-primary">{certAmount.toLocaleString("ru-RU")} ₽</strong>
                     </p>
@@ -209,7 +216,13 @@ export default function CouponPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => router.push(`/checkout/${certificateId}?amount=${certAmount}&type=certificate`)}
+                        onClick={() => {
+                          if (certAmount < 100 || certAmount > 100000) {
+                            setCertAmountError("Введите сумму от 100 до 100 000 ₽");
+                            return;
+                          }
+                          router.push(`/checkout/${certificateId}?amount=${certAmount}&type=certificate`);
+                        }}
                         className="flex-1 rounded-xl bg-primary py-3 font-semibold text-white hover:bg-primary/90"
                       >
                         Купить подарочный сертификат
