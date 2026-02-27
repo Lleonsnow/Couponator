@@ -12,6 +12,8 @@ type Coupon = {
   id: string;
   title: string;
   price: number;
+  oldPrice?: number | null;
+  discountPercent?: number | null;
   city: string | null;
   noGeo: boolean;
   imageUrl: string | null;
@@ -98,20 +100,6 @@ export default function CouponPage() {
                   <p className="text-sm text-slate-500">Партнер</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={async () => {
-                  const r = await fetch(apiUrl(`/api/merchants/${coupon.merchant.id}/certificate`));
-                  if (!r.ok) return;
-                  const cert = await r.json();
-                  setCertificateId(cert.id);
-                  setCertAmount(100);
-                  setModalCertOpen(true);
-                }}
-                className="mt-3 text-sm text-slate-500 underline decoration-slate-300 hover:text-slate-700 hover:decoration-slate-500"
-              >
-                Купить подарочный сертификат у данного продавца
-              </button>
             </div>
             <div>
               <div className="mb-4 flex items-center justify-between gap-2">
@@ -123,13 +111,41 @@ export default function CouponPage() {
               </div>
               <h1 className="mb-4 sm:mb-6 text-xl font-extrabold leading-tight sm:text-2xl lg:text-3xl">{coupon.title}</h1>
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
-                <p className="mb-3 text-right text-2xl font-extrabold text-primary">{coupon.price.toLocaleString("ru-RU")} ₽</p>
+                {coupon.oldPrice != null && coupon.discountPercent != null && coupon.discountPercent > 0 ? (
+                  <div className="mb-4">
+                    <div className="mb-2 inline-flex items-center rounded-lg bg-gradient-to-r from-red-500 to-orange-500 px-3 py-1.5 text-sm font-bold tracking-wide text-white shadow-sm">
+                      −{coupon.discountPercent}%
+                    </div>
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <span className="text-xl font-extrabold text-primary">{coupon.price.toLocaleString("ru-RU")} ₽</span>
+                      <span className="text-slate-500 line-through" style={{ fontSize: "1.625rem" }}>{coupon.oldPrice.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-3 flex justify-end">
+                    <span className="text-2xl font-extrabold text-primary">{coupon.price.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => { setQuantity(1); setModalOpen(true); }}
                   className="w-full rounded-xl bg-primary py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition hover:bg-primary/90 min-h-[48px]"
                 >
                   Купить
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const r = await fetch(apiUrl(`/api/merchants/${coupon.merchant.id}/certificate`));
+                    if (!r.ok) return;
+                    const cert = await r.json();
+                    setCertificateId(cert.id);
+                    setCertAmount(100);
+                    setModalCertOpen(true);
+                  }}
+                  className="mt-3 w-full rounded-xl bg-orange-500 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition hover:bg-orange-600 min-h-[48px]"
+                >
+                  Подарочный сертификат
                 </button>
               </div>
 
