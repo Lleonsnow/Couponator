@@ -13,12 +13,14 @@ const patchSchema = z.object({
   categoryId: z.string().cuid().optional(),
   title: z.string().min(1).max(500).optional(),
   price: z.number().int().min(0).optional(),
+  oldPrice: z.number().int().min(0).nullable().optional(),
+  discountPercent: z.number().int().min(0).max(99).nullable().optional(),
   noGeo: z.boolean().optional(),
   city: z.string().max(100).nullable().optional(),
   conditionsHtml: z.string().optional(),
   descriptionHtml: z.string().optional(),
   addressHtml: z.string().optional(),
-  imageUrl: z.string().url().nullable().optional(),
+  imageUrl: z.string().max(2000).nullable().optional(),
 });
 
 export async function GET(_req: Request, { params }: Params) {
@@ -65,11 +67,14 @@ export async function PATCH(req: Request, { params }: Params) {
     if (!cat) return NextResponse.json({ error: "Category not found" }, { status: 400 });
   }
 
-  const updateData = {
+  let finalPrice = data.price ?? coupon.price;
+  if (data.oldPrice != null && data.discountPercent != null) {
+    finalPrice = Math.round(data.oldPrice * (1 - data.discountPercent / 100));
+  }
+  const updateData: Record<string, unknown> = {
     ...(data.merchantId !== undefined && isAdmin && { merchantId: data.merchantId }),
     ...(data.categoryId && { categoryId: data.categoryId }),
     ...(data.title !== undefined && { title: data.title }),
-    ...(data.price !== undefined && { price: data.price }),
     ...(data.noGeo !== undefined && {
       noGeo: data.noGeo,
       city: data.noGeo ? null : (data.city ?? null),
@@ -80,10 +85,14 @@ export async function PATCH(req: Request, { params }: Params) {
     ...(data.addressHtml !== undefined && { addressHtml: data.addressHtml }),
     ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
   };
+  if (data.price !== undefined) updateData.price = data.price;
+  if (data.oldPrice !== undefined) updateData.oldPrice = data.oldPrice;
+  if (data.discountPercent !== undefined) updateData.discountPercent = data.discountPercent;
+  if (data.oldPrice != null && data.discountPercent != null) updateData.price = finalPrice;
 
   const updated = await prisma.coupon.update({
     where: { id },
-    data: updateData,
+    data: updateData as Parameters<typeof prisma.coupon.update>[0]["data"],
     include: { category: true, merchant: true },
   });
   return NextResponse.json(updated);
