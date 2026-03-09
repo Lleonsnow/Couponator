@@ -51,6 +51,8 @@ export function FooterDocumentsDropdown() {
             <Link
               key={href}
               href={href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="block px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition"
               onClick={() => setOpen(false)}
             >
