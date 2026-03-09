@@ -1,7 +1,56 @@
 import { PrismaClient, Role } from "@prisma/client";
 import { hashSync } from "bcryptjs";
+import { XMLParser } from "fast-xml-parser";
 
 const prisma = new PrismaClient();
+
+function text(el: unknown): string {
+  if (el == null) return "";
+  if (typeof el === "string") return String(el).trim();
+  if (typeof el === "object" && el !== null && "#text" in el) return String((el as { "#text"?: string })["#text"] ?? "").trim();
+  return "";
+}
+
+function one<T>(x: T | T[]): T {
+  return Array.isArray(x) ? x[0]! : x;
+}
+
+function all<T>(x: T | T[]): T[] {
+  return Array.isArray(x) ? x : [x];
+}
+
+async function fetchAdmitadPromocodes(feedUrl: string): Promise<{ store: string; title: string; code: string; discount: string; desc: string; logo: string; link: string }[]> {
+  const res = await fetch(feedUrl);
+  if (!res.ok) throw new Error(`Admitad feed failed: ${res.status} ${res.statusText}`);
+  const xml = await res.text();
+  const parser = new XMLParser({ ignoreAttributes: false });
+  const root = parser.parse(xml)?.admitad_coupons;
+  if (!root) return [];
+
+  const campaigns = all((root.advcampaigns as { advcampaign?: unknown })?.advcampaign ?? []) as Record<string, unknown>[];
+  const campaignNames: Record<string, string> = {};
+  for (const c of campaigns) {
+    const id = c["@_id"] ?? c.id;
+    if (id != null) campaignNames[String(id)] = text(c.name) || text(c["#text"]) || "—";
+  }
+
+  const coupons = all(one(root.coupons)?.coupon ?? []) as Record<string, unknown>[];
+  const rows: { store: string; title: string; code: string; discount: string; desc: string; logo: string; link: string }[] = [];
+  for (const c of coupons) {
+    const campaignId = String(c.advcampaign_id ?? c["@_id"] ?? "");
+    const store = campaignNames[campaignId] || "—";
+    const name = text(c.name);
+    const codeRaw = text(c.promocode);
+    const code = !codeRaw || /not required/i.test(codeRaw) ? "—" : codeRaw;
+    const discount = text(c.discount) || "";
+    const desc = text(c.description) || "";
+    const logo = text(c.logo) || "";
+    const link = text(c.promolink) || text(c.gotolink) || "";
+    if (!name || !link) continue;
+    rows.push({ store, title: name, code, discount, desc, logo, link });
+  }
+  return rows;
+}
 const DEMO_PASSWORD = "demo123";
 
 const CATEGORIES = [
@@ -97,7 +146,6 @@ async function main() {
 
   const categories = await prisma.category.findMany();
   log(`  категорий: ${categories.length}`);
-  const catBySlug = Object.fromEntries(categories.map((c) => [c.slug, c]));
 
   log("мерчанты...");
   const merchants: { id: string }[] = [];
@@ -121,18 +169,25 @@ async function main() {
   await prisma.transaction.deleteMany({});
   await prisma.coupon.deleteMany({});
 
-  log("промокоды (7)...");
+  const feedUrl = process.env.ADMITAD_FEED_URL;
   await prisma.promoCode.deleteMany({});
-  const PROMO_CODES = [
-    { store: "Алёнка", title: "Скидка 50% по промокоду + подарки", code: "ФЕВРАЛЬ", discount: "50%", desc: "Батончики РотФронт при заказе от 999 р.", logo: "/seed/promo-alenka.png", link: "https://dhwnh.com/g/wu9btps6pk98f8b05a7b45305aaa81/?i=3" },
-    { store: "ECCO", title: "Скидка 500 рублей на все", code: "ECCOADMITAD500", discount: "500 ₽", desc: "Не применяется к акционным товарам", logo: "/seed/promo-ecco.png", link: "https://kdbov.com/g/thm6cegqfc98f8b05a7b2cb26b7aaa/?i=3" },
-    { store: "Playtoday", title: "Скидка 10% на все!", code: "TOGETHER10", discount: "10%", desc: "Скидка на детскую одежду", logo: "/seed/promo-playtoday.svg", link: "https://rcpsj.com/g/o816muoptj98f8b05a7b78ec4c4caa/?i=3" },
-    { store: "xcom-shop", title: "Скидка 3% на заказ", code: "Admitad_02", discount: "3%", desc: "Скидка на электронику и инструменты", logo: "/seed/promo-xcom-shop.png", link: "https://bywiola.com/g/5icdsgkpe798f8b05a7b67a4d63e81/?i=3" },
-    { store: "COZY HOME", title: "Скидка 30% от 5000", code: "admitad30", discount: "30%", desc: "Действует только онлайн", logo: "/seed/promo-cozy-home.jpg", link: "https://ficca2021.com/g/k7pgzv4jt698f8b05a7b74bec426fb/?i=3" },
-    { store: "belle you", title: "Скидка 6% при заказе от 5500р", code: "admitad6", discount: "6%", desc: "Действует онлайн для всех клиентов", logo: "/seed/promo-belle-you.svg", link: "https://thevospad.com/g/jdwj1fvgbt98f8b05a7b9db36b8b43/?i=3" },
-    { store: "YVES ROCHER", title: "Скидка 25% от 4000 руб", code: "АMMA-B4L", discount: "25%", desc: "Уходовая косметика и парфюмерия", logo: "/seed/promo-yves-rocher.svg", link: "https://cafxq.com/g/2sfsmfuy1a98f8b05a7bc188ef9305/?i=3" },
-  ];
-  await prisma.promoCode.createMany({ data: PROMO_CODES });
+
+  if (feedUrl) {
+    log("промокоды из ADMITAD_FEED_URL...");
+    try {
+      const rows = await fetchAdmitadPromocodes(feedUrl);
+      const chunk = 100;
+      for (let i = 0; i < rows.length; i += chunk) {
+        await prisma.promoCode.createMany({ data: rows.slice(i, i + chunk) });
+      }
+      log(`  загружено промокодов: ${rows.length}`);
+    } catch (e) {
+      console.error("[seed] Admitad feed error:", e);
+      log("  промокоды не загружены (ошибка фида)");
+    }
+  } else {
+    log("промокоды пропущены (ADMITAD_FEED_URL не задан)");
+  }
 
   log("готово.");
   log("---");
@@ -141,7 +196,6 @@ async function main() {
   log("  admin@admin.ru, merchant2@demo.ru, merchant3@demo.ru — мерчанты");
   log("  user@mail.ru, guest12@mail.ru, test@yandex.ru, roman@gmail.com — покупатели");
   log("---");
-  log("создано: категорий " + CATEGORIES.length + ", мерчантов " + merchants.length + ", промокодов 7");
 }
 
 main()
