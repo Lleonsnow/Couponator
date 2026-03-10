@@ -39,6 +39,7 @@ export default function AdminMerchantsPage() {
   const [password, setPassword] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     fetch(apiUrl("/api/merchants"), { credentials: "include" })
@@ -51,6 +52,25 @@ export default function AdminMerchantsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  function handleDelete(id: string) {
+    if (!window.confirm("Удалить мерчанта и все его купоны?")) return;
+    setDeletingId(id);
+    fetch(apiUrl(`/api/merchants/${id}`), {
+      method: "DELETE",
+      credentials: "include",
+    })
+      .then((r) => {
+        if (!r.ok) return r.json().then((d) => { throw new Error((d as { error?: string }).error ?? "Ошибка"); });
+      })
+      .then(() => {
+        setList((prev) => prev.filter((m) => m.id !== id));
+      })
+      .catch((err: Error) => {
+        alert(err.message ?? "Ошибка удаления");
+      })
+      .finally(() => setDeletingId((prev) => (prev === id ? null : prev)));
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -178,6 +198,7 @@ export default function AdminMerchantsPage() {
               <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">ID</th>
               <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Название</th>
               <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Slug</th>
+              <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-right text-xs sm:text-sm font-semibold text-slate-500">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -186,6 +207,16 @@ export default function AdminMerchantsPage() {
                 <td className="px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-500">{m.id.slice(0, 8)}</td>
                 <td className="px-3 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{m.name}</td>
                 <td className="px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-600 truncate max-w-[100px] sm:max-w-none">{m.slug}</td>
+                <td className="px-3 py-2 sm:px-4 sm:py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(m.id)}
+                    disabled={deletingId === m.id}
+                    className="inline-flex items-center justify-center rounded-lg border border-red-200 px-3 py-1.5 text-xs sm:text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                  >
+                    {deletingId === m.id ? "Удаление…" : "Удалить"}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

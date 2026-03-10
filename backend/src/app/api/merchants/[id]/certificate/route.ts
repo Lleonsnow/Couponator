@@ -3,21 +3,23 @@ import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: Promise<{ merchantId: string }> };
+type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, { params }: Params) {
-  const { merchantId } = await params;
+  const { id } = await params;
   let cert = await prisma.certificate.findFirst({
-    where: { merchantId, isActive: true },
+    where: { merchantId: id, isActive: true },
   });
   if (!cert) {
     const merchant = await prisma.merchant.findUnique({
-      where: { id: merchantId },
+      where: { id },
     });
-    if (!merchant) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!merchant)
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     cert = await prisma.certificate.create({
-      data: { merchantId, title: "Подарочный сертификат" },
+      data: { merchantId: id, title: "Подарочный сертификат" },
     });
   }
   return NextResponse.json(cert);
 }
+
