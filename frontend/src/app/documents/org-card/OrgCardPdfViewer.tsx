@@ -1,5 +1,7 @@
-const PDF_VIEW_URL = "/api/documents/pdf/org-card";
-const PDF_DOWNLOAD_URL = "/documents/org-card.pdf";
+import { apiUrl } from "@/lib/api";
+
+const PDF_VIEW_URL = apiUrl("/api/documents/pdf/org-card");
+const PDF_DOWNLOAD_URL = apiUrl("/api/documents/file/org-card");
 
 export function OrgCardPdfViewer() {
   return (

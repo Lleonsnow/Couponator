@@ -119,3 +119,11 @@ model Banner {
   html String     @default("")
   order Int       @default(0)
 }
+
+model DocumentFile {
+  slug      String   @id
+  ext       String
+  mime      String
+  data      Bytes
+  updatedAt DateTime @updatedAt
+}

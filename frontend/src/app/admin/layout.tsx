@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Building2, Ticket, CreditCard, Image } from "lucide-react";
+import { LayoutDashboard, Building2, Ticket, CreditCard, Image, FileText } from "lucide-react";
 import { Header } from "@/components/Header";
 import { apiUrl } from "@/lib/api";
 
@@ -13,6 +13,7 @@ const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "/admin/coupons": Ticket,
   "/admin/banners": Image,
   "/admin/transactions": CreditCard,
+  "/admin/documents": FileText,
 };
 
 export default function AdminLayout({
@@ -53,6 +54,7 @@ export default function AdminLayout({
     { href: "/admin/coupons", label: "Все купоны" },
     { href: "/admin/banners", label: "Банеры" },
     { href: "/admin/transactions", label: "Транзакции" },
+    { href: "/admin/documents", label: "Документы" },
   ];
 
   return (
