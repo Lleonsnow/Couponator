@@ -95,7 +95,19 @@ export default function CouponPage() {
                 className="aspect-video w-full rounded-xl object-cover shadow-sm"
               />
               <div className="mt-5 flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <div className="h-12 w-12 shrink-0 rounded-full bg-slate-300" />
+                <div className="relative h-12 w-12 shrink-0">
+                  <img
+                    src={apiUrl(`/api/merchants/${coupon.merchant.id}/logo`)}
+                    alt=""
+                    className="h-12 w-12 rounded-full object-cover"
+                    onError={(e) => {
+                      const t = e.target as HTMLImageElement;
+                      t.style.display = "none";
+                      t.nextElementSibling?.classList.remove("hidden");
+                    }}
+                  />
+                  <div className="absolute inset-0 hidden rounded-full bg-slate-300" aria-hidden />
+                </div>
                 <div>
                   <p className="font-bold text-slate-900">{coupon.merchant.name}</p>
                   <p className="text-sm text-slate-500">Партнер</p>

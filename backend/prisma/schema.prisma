@@ -46,6 +46,16 @@ model Merchant {
   createdAt    DateTime      @default(now())
   coupons      Coupon[]
   certificates Certificate[]
+  logo         MerchantLogo?
+}
+
+model MerchantLogo {
+  id         String   @id @default(cuid())
+  merchantId String   @unique
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  data       Bytes
+  mime       String
+  updatedAt  DateTime @updatedAt
 }
 
 model Coupon {
