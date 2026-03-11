@@ -40,6 +40,23 @@ export default function AdminMerchantsPage() {
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [logoLoadingId, setLogoLoadingId] = useState<string | null>(null);
+  const [logoKeyByMerchantId, setLogoKeyByMerchantId] = useState<Record<string, number>>({});
+
+  function handleLogoUpload(merchantId: string, file: File | null) {
+    if (!file) return;
+    setLogoLoadingId(merchantId);
+    const fd = new FormData();
+    fd.append("file", file);
+    fetch(apiUrl(`/api/merchants/${merchantId}/logo`), {
+      method: "POST",
+      credentials: "include",
+      body: fd,
+    })
+      .then((r) => { if (!r.ok) return r.json().then((d: { error?: string }) => { throw new Error(d.error); }); setLogoKeyByMerchantId((prev) => ({ ...prev, [merchantId]: (prev[merchantId] ?? 0) + 1 })); })
+      .catch((err: Error) => alert(err.message ?? "Ошибка загрузки"))
+      .finally(() => setLogoLoadingId(null));
+  }
 
   const load = useCallback(() => {
     fetch(apiUrl("/api/merchants"), { credentials: "include" })
@@ -195,6 +212,7 @@ export default function AdminMerchantsPage() {
         <table className="w-full min-w-[320px] border-collapse">
           <thead>
             <tr className="bg-slate-50">
+              <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Лого</th>
               <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">ID</th>
               <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Название</th>
               <th className="border-b border-slate-200 px-3 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-slate-500">Slug</th>
@@ -204,6 +222,32 @@ export default function AdminMerchantsPage() {
           <tbody>
             {list.map((m) => (
               <tr key={m.id} className="border-b border-slate-100">
+                <td className="px-3 py-2 sm:px-4 sm:py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="relative h-10 w-10 shrink-0">
+                      <img
+                        src={`${apiUrl(`/api/merchants/${m.id}/logo`)}?t=${logoKeyByMerchantId[m.id] ?? 0}`}
+                        alt=""
+                        className="h-10 w-10 rounded-full object-cover bg-slate-200"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                        }}
+                      />
+                      <div className="absolute inset-0 hidden rounded-full bg-slate-300" aria-hidden />
+                    </div>
+                    <label className="cursor-pointer text-xs font-semibold text-primary hover:underline">
+                      {logoLoadingId === m.id ? "…" : "Загрузить"}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={(ev) => { const f = ev.target.files?.[0]; if (f) handleLogoUpload(m.id, f); ev.target.value = ""; }}
+                        disabled={logoLoadingId === m.id}
+                      />
+                    </label>
+                  </div>
+                </td>
                 <td className="px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-500">{m.id.slice(0, 8)}</td>
                 <td className="px-3 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{m.name}</td>
                 <td className="px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-600 truncate max-w-[100px] sm:max-w-none">{m.slug}</td>

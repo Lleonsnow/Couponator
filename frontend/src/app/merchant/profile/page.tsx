@@ -12,6 +12,8 @@ export default function MerchantProfilePage() {
   const [slug, setSlug] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [logoKey, setLogoKey] = useState(0);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   useEffect(() => {
     fetch(apiUrl("/api/merchant/profile"), { credentials: "include" })
@@ -56,12 +58,54 @@ export default function MerchantProfilePage() {
       .finally(() => setSubmitting(false));
   }
 
+  function handleLogoUpload(file: File | null) {
+    if (!file || !profile) return;
+    setLogoUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    fetch(apiUrl(`/api/merchants/${profile.id}/logo`), {
+      method: "POST",
+      credentials: "include",
+      body: fd,
+    })
+      .then((r) => { if (!r.ok) return r.json().then((d: { error?: string }) => { throw new Error(d.error); }); setLogoKey((k) => k + 1); })
+      .catch((err: Error) => alert(err.message ?? "Ошибка загрузки"))
+      .finally(() => setLogoUploading(false));
+  }
+
   if (loading) return <p className="text-slate-500">Загрузка...</p>;
   if (!profile) return <p className="text-slate-500">Не удалось загрузить профиль.</p>;
 
   return (
     <div>
       <h1 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-extrabold">Данные компании</h1>
+      <div className="mb-6 flex items-center gap-4">
+        <div className="relative h-16 w-16 shrink-0">
+          <img
+            key={logoKey}
+            src={`${apiUrl(`/api/merchants/${profile.id}/logo`)}?t=${logoKey}`}
+            alt=""
+            className="h-16 w-16 rounded-full object-cover bg-slate-200"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+              (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+            }}
+          />
+          <div className="absolute inset-0 hidden rounded-full bg-slate-300" aria-hidden />
+        </div>
+        <div>
+          <label className="cursor-pointer inline-block rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            {logoUploading ? "Загрузка…" : "Загрузить фото партнера"}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(ev) => { const f = ev.target.files?.[0]; if (f) handleLogoUpload(f); ev.target.value = ""; }}
+              disabled={logoUploading}
+            />
+          </label>
+        </div>
+      </div>
       <form onSubmit={handleSubmit} className="max-w-md space-y-4">
         <div>
           <label className="block text-sm font-semibold text-slate-500">Название компании</label>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
+import { apiUrl } from "@/lib/api";
 
 export function DocumentContent({
   slug,
@@ -17,7 +18,7 @@ export function DocumentContent({
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/documents/${slug}`)
+    fetch(apiUrl(`/api/documents/${slug}`))
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data: { html: string }) => setHtml(DOMPurify.sanitize(data.html)))
       .catch(() => setError(true))

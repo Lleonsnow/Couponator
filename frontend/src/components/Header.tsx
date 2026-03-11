@@ -2,20 +2,101 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useCity } from "@/context/CityContext";
 import { apiUrl } from "@/lib/api";
 
 type User = { role: string; email?: string } | null;
 
+function CityDropdown() {
+  const { city, setCity, cities, allCitiesLabel } = useCity();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filtered = query.trim()
+    ? [allCitiesLabel, ...cities].filter((c) =>
+        c.toLowerCase().includes(query.trim().toLowerCase())
+      )
+    : [allCitiesLabel, ...cities];
+
+  useEffect(() => {
+    if (open) {
+      setQuery("");
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (open && containerRef.current && !containerRef.current.contains(e.target as Node))
+        setOpen(false);
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={containerRef} onClick={(e) => e.stopPropagation()}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 min-h-[44px] md:min-h-0"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+      >
+        <span className="max-w-[140px] truncate font-medium">{city}</span>
+        <svg className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div
+          className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
+          role="listbox"
+        >
+          <div className="border-b border-slate-100 p-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Поиск города..."
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+              aria-label="Поиск города"
+            />
+          </div>
+          <div className="max-h-72 overflow-y-auto py-1">
+            {filtered.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-slate-500">Ничего не найдено</p>
+            ) : (
+              filtered.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  role="option"
+                  aria-selected={city === c}
+                  onClick={() => { setCity(c); setOpen(false); }}
+                  className={`block w-full truncate px-4 py-2.5 text-left text-sm transition ${city === c ? "bg-primary/10 font-semibold text-primary" : "text-slate-700 hover:bg-slate-50"}`}
+                >
+                  {c}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { city, setCity, cities, allCitiesLabel } = useCity();
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
-  const [cityOpen, setCityOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -41,45 +122,7 @@ export function Header() {
 
   const dashboardHref = user?.role === "ADMIN" ? "/admin" : user?.role === "MERCHANT" ? "/merchant" : null;
 
-  const cityDropdown = (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setCityOpen((o) => !o)}
-        className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-[var(--muted)] hover:border-slate-300 hover:text-[var(--text)] min-h-[44px] md:min-h-0"
-        aria-expanded={cityOpen}
-      >
-        <span className="max-w-[140px] truncate">{city}</span>
-        <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {cityOpen && (
-        <>
-          <div className="fixed inset-0 z-40" aria-hidden onClick={() => setCityOpen(false)} />
-          <div className="absolute left-0 top-full z-50 mt-1 max-h-64 w-52 overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
-            <button
-              type="button"
-              onClick={() => { setCity(allCitiesLabel); setCityOpen(false); }}
-              className={`block w-full px-4 py-2.5 text-left text-sm ${city === allCitiesLabel ? "bg-primary/10 font-semibold text-primary" : "text-slate-700 hover:bg-slate-50"}`}
-            >
-              {allCitiesLabel}
-            </button>
-            {cities.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => { setCity(c); setCityOpen(false); }}
-                className={`block w-full truncate px-4 py-2.5 text-left text-sm ${city === c ? "bg-primary/10 font-semibold text-primary" : "text-slate-700 hover:bg-slate-50"}`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
+  const cityDropdown = <CityDropdown />;
 
   const navLinks = (
     <>
