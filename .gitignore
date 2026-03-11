@@ -8,3 +8,4 @@ node_modules
 commit.sh
 *.tar
 *.tar.gz
+*.cursor
