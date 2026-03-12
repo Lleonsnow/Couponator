@@ -65,7 +65,7 @@ export function CouponGrid({
           price={c.price}
           oldPrice={c.oldPrice ?? undefined}
           discountPercent={c.discountPercent ?? undefined}
-          imageUrl={c.imageUrl ?? "/seed/coupon-bow.jpg"}
+          imageUrl={c.imageUrl ?? "/placeholder-coupon.svg"}
         />
       ))}
     </div>

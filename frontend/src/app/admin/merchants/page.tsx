@@ -230,11 +230,11 @@ export default function AdminMerchantsPage() {
                         alt=""
                         className="h-10 w-10 rounded-full object-cover bg-slate-200"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                          const t = e.target as HTMLImageElement;
+                          t.onerror = null;
+                          t.src = "/placeholder-user.svg";
                         }}
                       />
-                      <div className="absolute inset-0 hidden rounded-full bg-slate-300" aria-hidden />
                     </div>
                     <label className="cursor-pointer text-xs font-semibold text-primary hover:underline">
                       {logoLoadingId === m.id ? "…" : "Загрузить"}

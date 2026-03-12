@@ -47,7 +47,7 @@ export default function MerchantCouponsPage() {
             {list.map((c) => (
               <tr key={c.id} className="border-b border-slate-100">
                 <td className="px-2 py-2 sm:px-4 sm:py-2">
-                  <img src={c.imageUrl ?? ""} alt="" className="h-8 w-12 sm:h-10 sm:w-16 rounded object-cover" />
+                  <img src={c.imageUrl ?? "/placeholder-coupon.svg"} alt="" className="h-8 w-12 sm:h-10 sm:w-16 rounded object-contain bg-slate-100" />
                 </td>
                 <td className="max-w-[140px] sm:max-w-[240px] truncate px-2 py-2 sm:px-4 sm:py-3 text-sm font-medium" title={c.title}>{c.title}</td>
                 <td className="px-2 py-2 sm:px-4 sm:py-3 text-sm font-semibold">{c.price} ₽</td>

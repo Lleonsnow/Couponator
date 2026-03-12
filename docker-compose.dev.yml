@@ -1,0 +1,19 @@
+# Переопределение фронта для разработки с hot-reload.
+# Запуск: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# В .env можно оставить NODE_ENV=development для согласованности.
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ./frontend/public/documents:/app/public/documents:ro
+    ports:
+      - "3000:3000"
+    command: pnpm run dev

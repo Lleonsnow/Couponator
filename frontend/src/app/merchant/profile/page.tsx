@@ -87,11 +87,11 @@ export default function MerchantProfilePage() {
             alt=""
             className="h-16 w-16 rounded-full object-cover bg-slate-200"
             onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-              (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+              const t = e.target as HTMLImageElement;
+              t.onerror = null;
+              t.src = "/placeholder-user.svg";
             }}
           />
-          <div className="absolute inset-0 hidden rounded-full bg-slate-300" aria-hidden />
         </div>
         <div>
           <label className="cursor-pointer inline-block rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">

@@ -1,1 +1,9 @@
-{"name":"Купонатор","short_name":"Купонатор","icons":[{"src":"/favicons/logo_kupinator.svg","sizes":"any","type":"image/svg+xml"}]}
+{
+  "name": "Купонатор",
+  "short_name": "Купонатор",
+  "icons": [
+    { "src": "/favicons/favicon.ico", "sizes": "48x48", "type": "image/x-icon" },
+    { "src": "/favicons/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/favicons/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

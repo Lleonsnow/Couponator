@@ -65,7 +65,7 @@ export default function MyCouponsPage() {
             {list.map((tx) => {
               const isCert = !!tx.certificate;
               const title = isCert ? tx.certificate!.title : tx.coupon!.title;
-              const imageUrl = tx.coupon?.imageUrl ?? "/seed/coupon-bow.jpg";
+              const imageUrl = tx.coupon?.imageUrl ?? "/placeholder-coupon.svg";
               return (
                 <Link
                   key={tx.id}
@@ -76,7 +76,7 @@ export default function MyCouponsPage() {
                     <img
                       src={imageUrl}
                       alt=""
-                      className="aspect-video w-full object-cover"
+                      className="aspect-video w-full object-contain bg-slate-100"
                     />
                   )}
                   {isCert && (

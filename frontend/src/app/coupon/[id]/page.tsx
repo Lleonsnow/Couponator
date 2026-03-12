@@ -90,9 +90,9 @@ export default function CouponPage() {
           <div className="grid gap-6 sm:gap-8 p-4 sm:p-6 lg:p-10 lg:grid-cols-[1.2fr_1fr]">
             <div>
               <img
-                src={coupon.imageUrl ?? "/seed/coupon-bow.jpg"}
+                src={coupon.imageUrl ?? "/placeholder-coupon.svg"}
                 alt=""
-                className="aspect-video w-full rounded-xl object-cover shadow-sm"
+                className="aspect-video w-full rounded-xl object-contain bg-slate-100 shadow-sm"
               />
               <div className="mt-5 flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="relative h-12 w-12 shrink-0">
@@ -102,11 +102,10 @@ export default function CouponPage() {
                     className="h-12 w-12 rounded-full object-cover"
                     onError={(e) => {
                       const t = e.target as HTMLImageElement;
-                      t.style.display = "none";
-                      t.nextElementSibling?.classList.remove("hidden");
+                      t.onerror = null;
+                      t.src = "/placeholder-user.svg";
                     }}
                   />
-                  <div className="absolute inset-0 hidden rounded-full bg-slate-300" aria-hidden />
                 </div>
                 <div>
                   <p className="font-bold text-slate-900">{coupon.merchant.name}</p>
@@ -284,9 +283,9 @@ export default function CouponPage() {
                   className="flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:shadow-md"
                 >
                   <img
-                    src={c.imageUrl ?? "/seed/coupon-bow.jpg"}
+                    src={c.imageUrl ?? "/placeholder-coupon.svg"}
                     alt=""
-                    className="aspect-video w-full object-cover"
+                    className="aspect-video w-full object-contain bg-slate-100"
                   />
                   <div className="flex flex-1 flex-col p-3 sm:p-4">
                     <div className="mb-1 sm:mb-2 flex items-center justify-between gap-2">

@@ -15,6 +15,8 @@ function CityDropdown() {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const filtered = query.trim()
     ? [allCitiesLabel, ...cities].filter((c) =>
@@ -31,16 +33,61 @@ function CityDropdown() {
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
-      if (open && containerRef.current && !containerRef.current.contains(e.target as Node))
+      const target = e.target as Node;
+      if (open && containerRef.current && !containerRef.current.contains(target) && !panelRef.current?.contains(target))
         setOpen(false);
     };
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, [open]);
 
+  const dropdownPanel = open && buttonRef.current && typeof document !== "undefined" && createPortal(
+    <div
+      ref={panelRef}
+      className="fixed w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-[100]"
+      role="listbox"
+      style={{
+        top: buttonRef.current.getBoundingClientRect().bottom + 8,
+        left: buttonRef.current.getBoundingClientRect().left,
+      }}
+    >
+      <div className="border-b border-slate-100 p-2">
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Поиск города..."
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          aria-label="Поиск города"
+        />
+      </div>
+      <div className="max-h-72 overflow-y-auto py-1">
+        {filtered.length === 0 ? (
+          <p className="px-4 py-3 text-sm text-slate-500">Ничего не найдено</p>
+        ) : (
+          filtered.map((c) => (
+            <button
+              key={c}
+              type="button"
+              role="option"
+              aria-selected={city === c}
+              onClick={() => { setCity(c); setOpen(false); }}
+              className={`block w-full truncate px-4 py-2.5 text-left text-sm transition ${city === c ? "bg-primary/10 font-semibold text-primary" : "text-slate-700 hover:bg-slate-50"}`}
+            >
+              {c}
+            </button>
+          ))
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+
   return (
     <div className="relative" ref={containerRef} onClick={(e) => e.stopPropagation()}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 min-h-[44px] md:min-h-0"
@@ -52,42 +99,7 @@ function CityDropdown() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      {open && (
-        <div
-          className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
-          role="listbox"
-        >
-          <div className="border-b border-slate-100 p-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Поиск города..."
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-              aria-label="Поиск города"
-            />
-          </div>
-          <div className="max-h-72 overflow-y-auto py-1">
-            {filtered.length === 0 ? (
-              <p className="px-4 py-3 text-sm text-slate-500">Ничего не найдено</p>
-            ) : (
-              filtered.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  role="option"
-                  aria-selected={city === c}
-                  onClick={() => { setCity(c); setOpen(false); }}
-                  className={`block w-full truncate px-4 py-2.5 text-left text-sm transition ${city === c ? "bg-primary/10 font-semibold text-primary" : "text-slate-700 hover:bg-slate-50"}`}
-                >
-                  {c}
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      )}
+      {dropdownPanel}
     </div>
   );
 }
@@ -169,15 +181,23 @@ export function Header() {
     ));
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 shadow-sm backdrop-blur">
-      <div className="mx-auto flex min-h-14 md:min-h-[76px] max-w-[var(--container)] items-center justify-between gap-3 px-4 sm:px-5">
-        <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
-          <Link href="/" className="text-xl sm:text-2xl font-extrabold text-primary shrink-0 truncate">
-            Купонатор
+    <header className="sticky top-0 z-50 overflow-hidden border-b border-slate-100 bg-white/95 shadow-sm backdrop-blur">
+      <div className="mx-auto flex min-h-14 md:min-h-[76px] max-w-[var(--container)] items-center justify-between gap-3 px-4 sm:px-5 py-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-4">
+          <Link
+            href="/"
+            className="group flex shrink-0 max-w-[120px] md:max-w-[360px] items-center rounded-xl p-2 transition-all duration-300 ease-out shadow-[0_0_20px_rgba(59,130,246,0.12),0_4px_6px_rgba(0,0,0,0.05)] hover:shadow-[0_0_28px_rgba(59,130,246,0.28),0_8px_20px_rgba(0,0,0,0.12)]"
+            aria-label="Купонатор"
+          >
+            <img
+              src="/favicons/logo_kupinator.svg"
+              alt="Купонатор"
+              className="h-12 w-full max-w-full object-contain object-left md:h-14"
+            />
           </Link>
-          <div className="hidden lg:block">{cityDropdown}</div>
+          <div className="hidden min-w-0 shrink lg:block">{cityDropdown}</div>
         </div>
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden shrink-0 flex-wrap items-center justify-end gap-4 lg:flex md:gap-6">
           {navLinks}
           {userBlock}
         </nav>

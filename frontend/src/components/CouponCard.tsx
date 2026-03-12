@@ -20,9 +20,9 @@ export function CouponCard({ id, title, category, city, price, oldPrice, discoun
       className="flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm transition hover:-translate-y-1.5 hover:shadow-md"
     >
       <img
-        src={imageUrl}
+        src={imageUrl || "/placeholder-coupon.svg"}
         alt=""
-        className="aspect-video w-full object-cover bg-slate-100"
+        className="aspect-video w-full object-contain bg-slate-100"
       />
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="mb-2 sm:mb-3 flex items-center justify-between gap-2">

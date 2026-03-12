@@ -191,7 +191,7 @@ export default function MerchantCouponEditPage() {
         </div>
         <div>
           <label className="block text-sm font-semibold text-slate-500">URL или путь к изображению</label>
-          <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://... или /seed/photo.jpg" className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 min-h-[48px]" />
+          <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." className="mt-1 w-full rounded-lg border border-slate-300 px-3 sm:px-4 py-3 min-h-[48px]" />
         </div>
         <div>
           <label className="block text-sm font-semibold text-slate-500">Условия (HTML)</label>
