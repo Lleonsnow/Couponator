@@ -250,24 +250,24 @@ export default function CouponPage() {
             </div>
           </div>
 
-          <div className="border-t border-slate-100 px-4 pb-8 pt-4 sm:px-6 sm:pb-10 sm:pt-6 lg:px-10">
-            <div className="mb-6 sm:mb-8 flex gap-4 sm:gap-8 border-b-2 border-slate-100 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+          <div className="border-t border-slate-100 px-6 pb-10 pt-6 sm:px-8 sm:pb-12 sm:pt-8 lg:px-14 lg:pb-14 lg:pt-10 min-h-[48rem] sm:min-h-[52rem] flex flex-col overflow-x-hidden min-w-0">
+            <div className="mb-6 sm:mb-8 flex gap-4 sm:gap-8 border-b-2 border-slate-100 overflow-y-auto -mx-2 px-2 sm:-mx-4 sm:px-4 lg:-mx-6 lg:px-6 scrollbar-none shrink-0">
               {tabs.map((t) => (
                 <button
                   key={t.id}
                   type="button"
                   onClick={() => setTab(t.id)}
-                  className={`shrink-0 border-b-2 pb-3 sm:pb-4 text-sm sm:text-base font-semibold transition -mb-0.5 ${
+                  className={`shrink-0 border-b-2 border-transparent pb-3 sm:pb-4 text-sm sm:text-base font-semibold transition box-border ${
                     tab === t.id
-                      ? "border-primary text-primary"
-                      : "border-transparent text-slate-500 hover:text-slate-900"
+                      ? "!border-primary text-primary"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   {t.label}
                 </button>
               ))}
             </div>
-            <div className="prose prose-slate max-w-none text-slate-600">
+            <div className="prose prose-slate max-w-none text-slate-600 flex-1 min-h-[32rem] sm:min-h-[36rem] p-4 sm:p-6 overflow-x-hidden rounded-xl bg-slate-50/50 min-w-0">
               {tab === "cond" && <SandboxedHtml html={sanitizeForSandbox(coupon.conditionsHtml)} />}
               {tab === "desc" && <SandboxedHtml html={sanitizeForSandbox(coupon.descriptionHtml)} />}
               {tab === "gar" && <p>Все услуги сертифицированы. Возврат средств возможен в течение 14 дней.</p>}

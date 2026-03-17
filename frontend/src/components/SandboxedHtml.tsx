@@ -24,7 +24,7 @@ export function SandboxedHtml({ html }: { html: string }) {
   return (
     <div
       ref={hostRef}
-      className="sandboxed-html-host min-h-[1em] overflow-auto"
+      className="sandboxed-html-host min-h-[1em] max-w-full"
       suppressHydrationWarning
     />
   );
