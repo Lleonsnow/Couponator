@@ -38,8 +38,13 @@ const postSchema = z.object({
 });
 
 export async function GET() {
-  const merchants = await prisma.merchant.findMany({ take: 100 });
-  return NextResponse.json(merchants);
+  const merchants = await prisma.merchant.findMany({
+    take: 100,
+    include: { logo: { select: { merchantId: true } } },
+  });
+  return NextResponse.json(
+    merchants.map(({ logo, ...m }) => ({ ...m, hasLogo: !!logo })),
+  );
 }
 
 export async function POST(req: Request) {

@@ -27,10 +27,17 @@ export async function GET(_req: Request, { params }: Params) {
   const { id } = await params;
   const coupon = await prisma.coupon.findUnique({
     where: { id },
-    include: { category: true, merchant: true },
+    include: {
+      category: true,
+      merchant: { include: { logo: { select: { merchantId: true } } } },
+    },
   });
   if (!coupon) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(coupon);
+  const { merchant, ...rest } = coupon;
+  return NextResponse.json({
+    ...rest,
+    merchant: { id: merchant.id, name: merchant.name, hasLogo: !!merchant.logo },
+  });
 }
 
 export async function PATCH(req: Request, { params }: Params) {

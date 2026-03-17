@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiUrl } from "@/lib/api";
 
-type Profile = { id: string; name: string; slug: string };
+type Profile = { id: string; name: string; slug: string; hasLogo?: boolean };
 
 export default function MerchantProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -68,7 +68,7 @@ export default function MerchantProfilePage() {
       credentials: "include",
       body: fd,
     })
-      .then((r) => { if (!r.ok) return r.json().then((d: { error?: string }) => { throw new Error(d.error); }); setLogoKey((k) => k + 1); })
+      .then((r) => { if (!r.ok) return r.json().then((d: { error?: string }) => { throw new Error(d.error); }); setLogoKey((k) => k + 1); setProfile((p) => (p ? { ...p, hasLogo: true } : null)); })
       .catch((err: Error) => alert(err.message ?? "Ошибка загрузки"))
       .finally(() => setLogoUploading(false));
   }
@@ -83,7 +83,7 @@ export default function MerchantProfilePage() {
         <div className="relative h-16 w-16 shrink-0">
           <img
             key={logoKey}
-            src={`${apiUrl(`/api/merchants/${profile.id}/logo`)}?t=${logoKey}`}
+            src={profile.hasLogo ? `${apiUrl(`/api/merchants/${profile.id}/logo`)}?t=${logoKey}` : "/placeholder-user.svg"}
             alt=""
             className="h-16 w-16 rounded-full object-cover bg-slate-200"
             onError={(e) => {

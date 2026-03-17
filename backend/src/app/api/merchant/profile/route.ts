@@ -16,10 +16,11 @@ export async function GET(req: Request) {
 
   const merchant = await prisma.merchant.findUnique({
     where: { id: session.merchantId },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, logo: { select: { merchantId: true } } },
   });
   if (!merchant) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(merchant);
+  const { logo, ...rest } = merchant;
+  return NextResponse.json({ ...rest, hasLogo: !!logo });
 }
 
 export async function PATCH(req: Request) {
@@ -43,7 +44,8 @@ export async function PATCH(req: Request) {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.slug !== undefined && { slug: data.slug }),
     },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, logo: { select: { merchantId: true } } },
   });
-  return NextResponse.json(updated);
+  const { logo, ...rest } = updated;
+  return NextResponse.json({ ...rest, hasLogo: !!logo });
 }

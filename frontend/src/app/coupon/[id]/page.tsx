@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import DOMPurify from "dompurify";
 import { MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
+import { SandboxedHtml } from "@/components/SandboxedHtml";
 import { apiUrl } from "@/lib/api";
 
 type Coupon = {
@@ -21,10 +22,14 @@ type Coupon = {
   descriptionHtml: string;
   addressHtml: string;
   category: { name: string; slug: string };
-  merchant: { id: string; name: string };
+  merchant: { id: string; name: string; hasLogo?: boolean };
 };
 
 type TabId = "cond" | "desc" | "gar" | "addr" | "rev";
+
+/** Санитизация HTML для песочницы: разрешаем style/link, чтобы вёрстка заказчика работала внутри Shadow DOM. */
+const sanitizeForSandbox = (html: string) =>
+  DOMPurify.sanitize(html, { ADD_TAGS: ["style", "link"], ADD_ATTR: ["rel", "href", "crossorigin"] });
 
 export default function CouponPage() {
   const params = useParams();
@@ -97,7 +102,7 @@ export default function CouponPage() {
               <div className="mt-5 flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="relative h-12 w-12 shrink-0">
                   <img
-                    src={apiUrl(`/api/merchants/${coupon.merchant.id}/logo`)}
+                    src={coupon.merchant.hasLogo ? apiUrl(`/api/merchants/${coupon.merchant.id}/logo`) : "/placeholder-user.svg"}
                     alt=""
                     className="h-12 w-12 rounded-full object-cover"
                     onError={(e) => {
@@ -263,10 +268,10 @@ export default function CouponPage() {
               ))}
             </div>
             <div className="prose prose-slate max-w-none text-slate-600">
-              {tab === "cond" && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(coupon.conditionsHtml) }} />}
-              {tab === "desc" && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(coupon.descriptionHtml) }} />}
+              {tab === "cond" && <SandboxedHtml html={sanitizeForSandbox(coupon.conditionsHtml)} />}
+              {tab === "desc" && <SandboxedHtml html={sanitizeForSandbox(coupon.descriptionHtml)} />}
               {tab === "gar" && <p>Все услуги сертифицированы. Возврат средств возможен в течение 14 дней.</p>}
-              {tab === "addr" && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(coupon.addressHtml) }} />}
+              {tab === "addr" && <SandboxedHtml html={sanitizeForSandbox(coupon.addressHtml)} />}
               {tab === "rev" && <p>Отзывов пока нет.</p>}
             </div>
           </div>

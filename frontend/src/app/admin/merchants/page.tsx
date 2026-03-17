@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiUrl } from "@/lib/api";
 
-type Merchant = { id: string; name: string; slug: string };
+type Merchant = { id: string; name: string; slug: string; hasLogo?: boolean };
 
 const CYRILLIC_TO_LATIN: Record<string, string> = {
   а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z",
@@ -53,7 +53,7 @@ export default function AdminMerchantsPage() {
       credentials: "include",
       body: fd,
     })
-      .then((r) => { if (!r.ok) return r.json().then((d: { error?: string }) => { throw new Error(d.error); }); setLogoKeyByMerchantId((prev) => ({ ...prev, [merchantId]: (prev[merchantId] ?? 0) + 1 })); })
+      .then((r) => { if (!r.ok) return r.json().then((d: { error?: string }) => { throw new Error(d.error); }); setLogoKeyByMerchantId((prev) => ({ ...prev, [merchantId]: (prev[merchantId] ?? 0) + 1 })); setList((prev) => prev.map((m) => (m.id === merchantId ? { ...m, hasLogo: true } : m))); })
       .catch((err: Error) => alert(err.message ?? "Ошибка загрузки"))
       .finally(() => setLogoLoadingId(null));
   }
@@ -226,7 +226,7 @@ export default function AdminMerchantsPage() {
                   <div className="flex items-center gap-2">
                     <div className="relative h-10 w-10 shrink-0">
                       <img
-                        src={`${apiUrl(`/api/merchants/${m.id}/logo`)}?t=${logoKeyByMerchantId[m.id] ?? 0}`}
+                        src={m.hasLogo ? `${apiUrl(`/api/merchants/${m.id}/logo`)}?t=${logoKeyByMerchantId[m.id] ?? 0}` : "/placeholder-user.svg"}
                         alt=""
                         className="h-10 w-10 rounded-full object-cover bg-slate-200"
                         onError={(e) => {
